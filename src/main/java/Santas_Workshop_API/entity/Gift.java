@@ -2,6 +2,7 @@ package Santas_Workshop_API.entity;
 
 import Santas_Workshop_API.entity.enums.gift.Category;
 import Santas_Workshop_API.entity.enums.gift.Status;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
