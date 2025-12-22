@@ -1,5 +1,7 @@
 package Santas_Workshop_API.config;
 
+import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
+import Santas_Workshop_API.entity.DTO.gifts.GiftsDTO;
 import Santas_Workshop_API.entity.DTO.gifts.InputGiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.OutputGiftDTO;
 import Santas_Workshop_API.entity.Gift;
@@ -14,5 +16,6 @@ public interface GiftMapper {
 	@Mapping(target = "isWrapped", expression = "java(inputGiftDTO.getIsWrapped() == null || inputGiftDTO.getIsWrapped().equals(\"false\") ? false : true)")
 	Gift fromInputGiftDtoToGift(InputGiftDTO inputGiftDTO);
 	OutputGiftDTO fromGiftToOutputGiftDTO(Gift gift);
-
+	GiftsDTO fromGiftToGiftsDTO(Gift gift);
+	GiftDTO fromGiftToGiftDTO(Gift gift);
 }
