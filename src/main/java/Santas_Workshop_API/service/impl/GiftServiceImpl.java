@@ -5,7 +5,10 @@ import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.GiftsDTO;
 import Santas_Workshop_API.entity.DTO.gifts.InputGiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.OutputGiftDTO;
+import Santas_Workshop_API.entity.DTO.gifts.UpdateInputDTO;
 import Santas_Workshop_API.entity.Gift;
+import Santas_Workshop_API.entity.enums.gift.Category;
+import Santas_Workshop_API.entity.enums.gift.Status;
 import Santas_Workshop_API.repository.GiftsRepository;
 import Santas_Workshop_API.service.GiftService;
 import lombok.RequiredArgsConstructor;
@@ -55,8 +58,52 @@ public class GiftServiceImpl implements GiftService {
 	}
 
 	@Override
-	public InputGiftDTO updateGift(Long id, InputGiftDTO inputGiftDTO) {
-		return null;
+	public GiftDTO updateGift(Long id, UpdateInputDTO updateInputDTO) {
+		Gift gift = giftsRepository.findById(id).orElse(null);
+		if (gift == null) {
+			return null;
+		}
+		gift.setName(updateInputDTO.getName());
+		switch (updateInputDTO.getStatus()){
+			case "PENDING":
+				gift.setStatus(Status.PENDING);
+				break;
+			case "READY":
+				gift.setStatus(Status.READY);
+				break;
+			case "LOADED":
+				gift.setStatus(Status.LOADED);
+				break;
+			case "DELIVERED":
+				gift.setStatus(Status.DELIVERED);
+				break;
+		}
+		switch (updateInputDTO.getCategory()){
+			case "TOY":
+				gift.setCategory(Category.TOY);
+				break;
+			case "BOOK":
+				gift.setCategory(Category.BOOK);
+				break;
+			case "GADGET":
+				gift.setCategory(Category.GADGET);
+				break;
+			case "CLOTHES":
+				gift.setCategory(Category.CLOTHES);
+				break;
+			case "OTHER":
+				gift.setCategory(Category.OTHER);
+				break;
+		}
+		if (updateInputDTO.getIsWrapped().equals("true")) {
+			gift.setIsWrapped(true);
+		} else if (updateInputDTO.getIsWrapped().equals("false")) {
+			gift.setIsWrapped(false);
+		}
+		gift.setTargetAge(updateInputDTO.getTargetAge());
+
+		Gift save = giftsRepository.save(gift);
+		return GiftMapper.INSTANCE.fromGiftToGiftDTO(gift);
 	}
 
 	@Override

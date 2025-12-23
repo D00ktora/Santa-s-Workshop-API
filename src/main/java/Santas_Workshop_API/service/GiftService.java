@@ -4,6 +4,8 @@ import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.GiftsDTO;
 import Santas_Workshop_API.entity.DTO.gifts.InputGiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.OutputGiftDTO;
+import Santas_Workshop_API.entity.DTO.gifts.UpdateInputDTO;
+import Santas_Workshop_API.entity.Gift;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,7 @@ public interface GiftService {
 			int pageSize,
 			String sort) throws BadRequestException;
 	GiftDTO getGiftById(Long id);
-	InputGiftDTO updateGift(Long id, InputGiftDTO inputGiftDTO);
+	GiftDTO updateGift(Long id, UpdateInputDTO updateInputDTO);
 	InputGiftDTO wrapGift(Long id);
 	void deleteGift(Long id);
 	List<InputGiftDTO> searchGifts(String searchWord);
