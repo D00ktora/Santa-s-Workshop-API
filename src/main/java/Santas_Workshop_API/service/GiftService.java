@@ -24,7 +24,7 @@ public interface GiftService {
 			String sort) throws BadRequestException;
 	GiftDTO getGiftById(Long id);
 	GiftDTO updateGift(Long id, UpdateInputDTO updateInputDTO);
-	InputGiftDTO wrapGift(Long id);
+	GiftDTO wrapGift(Long id);
 	void deleteGift(Long id);
 	List<InputGiftDTO> searchGifts(String searchWord);
 }

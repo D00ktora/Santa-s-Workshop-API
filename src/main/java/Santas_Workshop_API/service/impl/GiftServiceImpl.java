@@ -64,37 +64,8 @@ public class GiftServiceImpl implements GiftService {
 			return null;
 		}
 		gift.setName(updateInputDTO.getName());
-		switch (updateInputDTO.getStatus()){
-			case "PENDING":
-				gift.setStatus(Status.PENDING);
-				break;
-			case "READY":
-				gift.setStatus(Status.READY);
-				break;
-			case "LOADED":
-				gift.setStatus(Status.LOADED);
-				break;
-			case "DELIVERED":
-				gift.setStatus(Status.DELIVERED);
-				break;
-		}
-		switch (updateInputDTO.getCategory()){
-			case "TOY":
-				gift.setCategory(Category.TOY);
-				break;
-			case "BOOK":
-				gift.setCategory(Category.BOOK);
-				break;
-			case "GADGET":
-				gift.setCategory(Category.GADGET);
-				break;
-			case "CLOTHES":
-				gift.setCategory(Category.CLOTHES);
-				break;
-			case "OTHER":
-				gift.setCategory(Category.OTHER);
-				break;
-		}
+		updateGiftStatus(updateInputDTO, gift);
+		updateGiftCategory(updateInputDTO, gift);
 		if (updateInputDTO.getIsWrapped().equals("true")) {
 			gift.setIsWrapped(true);
 		} else if (updateInputDTO.getIsWrapped().equals("false")) {
@@ -103,12 +74,16 @@ public class GiftServiceImpl implements GiftService {
 		gift.setTargetAge(updateInputDTO.getTargetAge());
 
 		Gift save = giftsRepository.save(gift);
-		return GiftMapper.INSTANCE.fromGiftToGiftDTO(gift);
+		return GiftMapper.INSTANCE.fromGiftToGiftDTO(save);
 	}
 
 	@Override
-	public InputGiftDTO wrapGift(Long id) {
-		return null;
+	public GiftDTO wrapGift(Long id) {
+		Gift gift = giftsRepository.findById(id).orElse(null);
+		if (gift == null) return null;
+		gift.setIsWrapped(true);
+		Gift saved = giftsRepository.save(gift);
+		return GiftMapper.INSTANCE.fromGiftToGiftDTO(saved);
 	}
 
 	@Override
@@ -169,5 +144,41 @@ public class GiftServiceImpl implements GiftService {
 					cb.equal(root.get("wrapped"), wrapped));
 		}
 		return specification;
+	}
+
+	private static void updateGiftCategory(UpdateInputDTO updateInputDTO, Gift gift) {
+		switch (updateInputDTO.getCategory()){
+			case "TOY":
+				gift.setCategory(Category.TOY);
+				break;
+			case "BOOK":
+				gift.setCategory(Category.BOOK);
+				break;
+			case "GADGET":
+				gift.setCategory(Category.GADGET);
+				break;
+			case "CLOTHES":
+				gift.setCategory(Category.CLOTHES);
+				break;
+			case "OTHER":
+				gift.setCategory(Category.OTHER);
+				break;
+		}
+	}
+
+	private static void updateGiftStatus(UpdateInputDTO updateInputDTO, Gift gift) {
+		switch (updateInputDTO.getStatus()){
+			case "PENDING":
+				gift.setStatus(Status.PENDING);
+			case "READY":
+				gift.setStatus(Status.READY);
+				break;
+			case "LOADED":
+				gift.setStatus(Status.LOADED);
+				break;
+			case "DELIVERED":
+				gift.setStatus(Status.DELIVERED);
+				break;
+		}
 	}
 }
