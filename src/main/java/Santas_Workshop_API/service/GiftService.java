@@ -26,5 +26,5 @@ public interface GiftService {
 	GiftDTO updateGift(Long id, UpdateInputDTO updateInputDTO);
 	GiftDTO wrapGift(Long id);
 	Boolean deleteGift(Long id);
-	List<InputGiftDTO> searchGifts(String searchWord);
+	List<GiftDTO> searchGifts(String searchWord);
 }

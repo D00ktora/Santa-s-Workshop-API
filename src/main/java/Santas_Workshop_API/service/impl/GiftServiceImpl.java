@@ -95,8 +95,14 @@ public class GiftServiceImpl implements GiftService {
 	}
 
 	@Override
-	public List<InputGiftDTO> searchGifts(String searchWord) {
-		return List.of();
+	public List<GiftDTO> searchGifts(String searchWord) {
+		List<Gift> giftsByName = giftsRepository.findByNameContainingIgnoreCase(searchWord);
+		if (giftsByName == null) return null;
+		List<GiftDTO> giftDTOS = new ArrayList<>();
+		for (Gift gift : giftsByName) {
+			giftDTOS.add(GiftMapper.INSTANCE.fromGiftToGiftDTO(gift));
+		}
+		return giftDTOS;
 	}
 
 	private ResponseEntity<OutputGiftDTO> correctlySavedGift(InputGiftDTO inputGiftDTO) {
