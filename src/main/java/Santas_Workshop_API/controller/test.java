@@ -1,10 +1,12 @@
 package Santas_Workshop_API.controller;
 
+import Santas_Workshop_API.entity.DTO.elves.ElfDTO;
 import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.GiftsDTO;
 import Santas_Workshop_API.entity.DTO.gifts.InputGiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.OutputGiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.UpdateInputDTO;
+import Santas_Workshop_API.service.ElfService;
 import Santas_Workshop_API.service.GiftService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +31,9 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class test {
-
+	/*
+	For Gift Controller start
+	 */
 	private final GiftService giftService;
 
 	@PostMapping("/")
@@ -63,14 +67,8 @@ public class test {
 	@PostMapping("/{id}")
 	public ResponseEntity<GiftDTO> updateGift(@PathVariable Long id, @RequestBody @Valid UpdateInputDTO updateInputDTO, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
-			StringBuilder errors = new StringBuilder();
-			for (FieldError fieldError : bindingResult.getFieldErrors()) {
-				errors.append(fieldError.getField())
-						.append(" - ")
-						.append(fieldError.getDefaultMessage())
-						.append(" / ");
-			}
-			return ResponseEntity.badRequest().header("Errors", errors.toString()).body(null);
+			String errors = getErrors(bindingResult);
+			return ResponseEntity.badRequest().header("Errors", errors).body(null);
 		}
 
 		GiftDTO giftDTO = giftService.updateGift(id, updateInputDTO);
@@ -102,5 +100,38 @@ public class test {
 	public ResponseEntity<List<GiftDTO>> searchGifts(@RequestParam String query) {
 		return ResponseEntity.ok(giftService.searchGifts(query));
 
+	}
+
+	/*
+	For Gift Controller End
+	 */
+
+
+
+	/*
+	For Elf Controller Start
+	 */
+
+	private final ElfService elfService;
+
+	@PostMapping("/elves")
+	public ResponseEntity<ElfDTO> createElf(@RequestBody @Valid ElfDTO elfDTO, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			String errors = getErrors(bindingResult);
+			return ResponseEntity.badRequest().header("Errors", errors).body(null);
+		}
+		return ResponseEntity.ok(elfService.createElf(elfDTO));
+	}
+
+
+	private static String getErrors(BindingResult bindingResult) {
+		StringBuilder errors = new StringBuilder();
+		for (FieldError fieldError : bindingResult.getFieldErrors()) {
+			errors.append(fieldError.getField())
+					.append(" - ")
+					.append(fieldError.getDefaultMessage())
+					.append(" / ");
+		}
+		return errors.toString();
 	}
 }
