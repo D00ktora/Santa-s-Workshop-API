@@ -87,8 +87,11 @@ public class GiftServiceImpl implements GiftService {
 	}
 
 	@Override
-	public void deleteGift(Long id) {
-
+	public Boolean deleteGift(Long id) {
+		Gift gift = giftsRepository.findById(id).orElse(null);
+		if (gift == null) return false;
+		giftsRepository.delete(gift);
+		return true;
 	}
 
 	@Override
