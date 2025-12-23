@@ -2,6 +2,7 @@ package Santas_Workshop_API.entity;
 
 import Santas_Workshop_API.entity.enums.gift.Category;
 import Santas_Workshop_API.entity.enums.gift.Status;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,9 +36,9 @@ public class Gift {
 	private Integer targetAge;
 	private Boolean isWrapped = false;
 	@Enumerated(EnumType.STRING)
-	private Status status;
+	private Status status = Status.PENDING;
 	@Column(nullable = false)
-	private LocalDateTime createdAt;
+	private LocalDateTime createdAt = LocalDateTime.now();
 	@ManyToOne
 	@JoinColumn(name = "elf_id")
 	private Elf elf;

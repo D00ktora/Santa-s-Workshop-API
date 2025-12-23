@@ -11,3 +11,5 @@ public class Application {
 	}
 
 }
+
+//todo: To add one more repo for delivered gifts. Where after delivery they will go. And they will be removed from gift repository.

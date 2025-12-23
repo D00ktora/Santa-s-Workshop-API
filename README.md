@@ -9,3 +9,12 @@ Notes for last:
 5. I change in entities fields that will be connected for ID`s. From List\<Long> to Set\<Gift> idea is to have managing of the gifts my JPA not manually by me. But I know how to do it. Just it will cost more process time to be done, because i need to manage and update both tables in my database. And many errors can apear from manual managing of database. 
    1. I think this One to many connections is better. And managing of the database will be easy.
 6. ![DatabaseDiagram.png](DatabaseDiagram.png)
+
+Validation for gift is done and body needs to look like this: 
+{
+"name": "12",
+"category": "GADGET",
+"targetAge": "10",
+"isWrapped":"true"
+}
+If some of the fields are NOK handling will be trigger. 
