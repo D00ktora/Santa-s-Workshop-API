@@ -12,8 +12,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -31,5 +31,6 @@ public class Elf {
 	private SkillLevel skillLevel;
 
 	@OneToMany(mappedBy = "elf")
-	private Set<Gift> assignedGiftIds = new HashSet<>();
+	private List<Gift> assignedGiftIds = new ArrayList<>(
+	);
 }

@@ -6,12 +6,14 @@ import Santas_Workshop_API.entity.DTO.gifts.GiftsDTO;
 import Santas_Workshop_API.entity.DTO.gifts.InputGiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.OutputGiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.UpdateInputDTO;
+import Santas_Workshop_API.entity.enums.gift.Status;
 import Santas_Workshop_API.service.ElfService;
 import Santas_Workshop_API.service.GiftService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -149,6 +151,18 @@ public class test {
 			return ResponseEntity.noContent().build();
 		}
 		return ResponseEntity.notFound().build();
+	}
+
+	@PostMapping("/elves/{elfId}/assign/{giftId}")
+	public ResponseEntity<ElfDTO> assignGift(@PathVariable Long elfId, @PathVariable Long giftId) {
+		if (elfService.getElfById(elfId) == null || giftService.getGiftById(giftId) == null) {
+			return ResponseEntity.notFound().build();
+		}
+		if (giftService.getGiftById(giftId).getStatus().equals(Status.DELIVERED.toString())) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		}
+		ElfDTO elfDTO = elfService.assignGift(elfId, giftId);
+		return ResponseEntity.ok(elfDTO);
 	}
 
 	/*

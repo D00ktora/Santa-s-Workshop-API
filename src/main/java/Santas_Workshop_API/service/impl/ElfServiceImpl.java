@@ -4,6 +4,7 @@ import Santas_Workshop_API.config.ElfMapper;
 import Santas_Workshop_API.entity.DTO.elves.ElfDTO;
 import Santas_Workshop_API.entity.Elf;
 import Santas_Workshop_API.repository.ElfRepository;
+import Santas_Workshop_API.service.AssignService;
 import Santas_Workshop_API.service.ElfService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.List;
 public class ElfServiceImpl implements ElfService {
 
 	private final ElfRepository elfRepository;
+	private final AssignService assignService;
 
 	@Override
 	public ElfDTO createElf(ElfDTO elfDTO) {
@@ -52,7 +54,7 @@ public class ElfServiceImpl implements ElfService {
 	}
 
 	@Override
-	public ElfDTO assignGift(ElfDTO elfDTO) {
-		return null;
+	public ElfDTO assignGift(Long elfId, Long giftId) {
+		return assignService.assignGiftToElf(elfId, giftId);
 	}
 }

@@ -9,5 +9,5 @@ public interface ElfService {
 	List<ElfDTO> getAllElves();
 	ElfDTO getElfById(Long id);
 	Boolean deleteElfById(Long id);
-	ElfDTO assignGift(ElfDTO elfDTO);
+	ElfDTO assignGift(Long id, Long giftId);
 }
