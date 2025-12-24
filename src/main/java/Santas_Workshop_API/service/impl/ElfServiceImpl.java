@@ -35,7 +35,11 @@ public class ElfServiceImpl implements ElfService {
 
 	@Override
 	public ElfDTO getElfById(Long id) {
-		return null;
+		Elf elf = elfRepository.findById(id).orElse(null);
+		if (elf == null) {
+			return null;
+		}
+		return ElfMapper.INSTANCE.fromElfToElfDTO(elf);
 	}
 
 	@Override

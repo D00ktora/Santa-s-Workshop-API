@@ -133,7 +133,14 @@ public class test {
 		return ResponseEntity.ok(allElves);
 	}
 
-	
+	@GetMapping("/elves/{id}")
+	public ResponseEntity<ElfDTO> getElf(@PathVariable Long id) {
+		ElfDTO elfDTO = elfService.getElfById(id);
+		if (elfDTO == null) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(elfDTO);
+	}
 
 	/*
 	For Gift and Elves Method, but it will be split after finishing
