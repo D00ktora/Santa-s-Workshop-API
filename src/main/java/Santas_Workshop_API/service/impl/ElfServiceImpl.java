@@ -8,6 +8,7 @@ import Santas_Workshop_API.service.ElfService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,7 +26,11 @@ public class ElfServiceImpl implements ElfService {
 
 	@Override
 	public List<ElfDTO> getAllElves() {
-		return List.of();
+		List<ElfDTO> elfDtos = new ArrayList<>();
+		for (Elf elf : elfRepository.findAll()) {
+			elfDtos.add(ElfMapper.INSTANCE.fromElfToElfDTO(elf));
+		}
+		return elfDtos;
 	}
 
 	@Override

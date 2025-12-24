@@ -124,6 +124,20 @@ public class test {
 	}
 
 
+	@GetMapping("/elves")
+	public ResponseEntity<List<ElfDTO>> getElfs() {
+		List<ElfDTO> allElves = elfService.getAllElves();
+		if (allElves.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(allElves);
+	}
+
+	
+
+	/*
+	For Gift and Elves Method, but it will be split after finishing
+	 */
 	private static String getErrors(BindingResult bindingResult) {
 		StringBuilder errors = new StringBuilder();
 		for (FieldError fieldError : bindingResult.getFieldErrors()) {

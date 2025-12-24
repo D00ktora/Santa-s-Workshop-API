@@ -8,7 +8,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @JsonPropertyOrder({
 		"id",
@@ -24,5 +26,5 @@ public class ElfDTO {
 	private String name;
 	@ElfLevelValidation
 	private String skillLevel;
-	private List<GiftDTO> assignedGiftIds = new ArrayList<>();
+	private Set<GiftDTO> assignedGiftIds = new HashSet<>();
 }
