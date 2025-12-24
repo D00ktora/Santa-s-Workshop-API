@@ -43,8 +43,12 @@ public class ElfServiceImpl implements ElfService {
 	}
 
 	@Override
-	public void deleteElfById(Long id) {
-
+	public Boolean deleteElfById(Long id) {
+		if (elfRepository.findById(id).orElse(null) == null) {
+			return false;
+		}
+		elfRepository.deleteById(id);
+		return true;
 	}
 
 	@Override

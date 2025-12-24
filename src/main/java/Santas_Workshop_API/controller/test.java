@@ -142,6 +142,15 @@ public class test {
 		return ResponseEntity.ok(elfDTO);
 	}
 
+	@DeleteMapping("/elves/{id}")
+	public ResponseEntity<?> deleteElf(@PathVariable Long id) {
+		Boolean result = elfService.deleteElfById(id);
+		if (result) {
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
+	}
+
 	/*
 	For Gift and Elves Method, but it will be split after finishing
 	 */
