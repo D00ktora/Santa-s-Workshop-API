@@ -1,15 +1,19 @@
 package Santas_Workshop_API.controller;
 
+import Santas_Workshop_API.entity.DTO.elves.ElfDTO;
 import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.GiftsDTO;
 import Santas_Workshop_API.entity.DTO.gifts.InputGiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.OutputGiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.UpdateInputDTO;
+import Santas_Workshop_API.entity.enums.gift.Status;
+import Santas_Workshop_API.service.ElfService;
 import Santas_Workshop_API.service.GiftService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -29,7 +33,9 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class test {
-
+	/*
+	For Gift Controller start
+	 */
 	private final GiftService giftService;
 
 	@PostMapping("/")
@@ -63,14 +69,8 @@ public class test {
 	@PostMapping("/{id}")
 	public ResponseEntity<GiftDTO> updateGift(@PathVariable Long id, @RequestBody @Valid UpdateInputDTO updateInputDTO, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
-			StringBuilder errors = new StringBuilder();
-			for (FieldError fieldError : bindingResult.getFieldErrors()) {
-				errors.append(fieldError.getField())
-						.append(" - ")
-						.append(fieldError.getDefaultMessage())
-						.append(" / ");
-			}
-			return ResponseEntity.badRequest().header("Errors", errors.toString()).body(null);
+			String errors = getErrors(bindingResult);
+			return ResponseEntity.badRequest().header("Errors", errors).body(null);
 		}
 
 		GiftDTO giftDTO = giftService.updateGift(id, updateInputDTO);
@@ -102,5 +102,80 @@ public class test {
 	public ResponseEntity<List<GiftDTO>> searchGifts(@RequestParam String query) {
 		return ResponseEntity.ok(giftService.searchGifts(query));
 
+	}
+
+	/*
+	For Gift Controller End
+	 */
+
+
+
+	/*
+	For Elf Controller Start
+	 */
+
+	private final ElfService elfService;
+
+	@PostMapping("/elves")
+	public ResponseEntity<ElfDTO> createElf(@RequestBody @Valid ElfDTO elfDTO, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			String errors = getErrors(bindingResult);
+			return ResponseEntity.badRequest().header("Errors", errors).body(null);
+		}
+		return ResponseEntity.ok(elfService.createElf(elfDTO));
+	}
+
+
+	@GetMapping("/elves")
+	public ResponseEntity<List<ElfDTO>> getElfs() {
+		List<ElfDTO> allElves = elfService.getAllElves();
+		if (allElves.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(allElves);
+	}
+
+	@GetMapping("/elves/{id}")
+	public ResponseEntity<ElfDTO> getElf(@PathVariable Long id) {
+		ElfDTO elfDTO = elfService.getElfById(id);
+		if (elfDTO == null) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(elfDTO);
+	}
+
+	@DeleteMapping("/elves/{id}")
+	public ResponseEntity<?> deleteElf(@PathVariable Long id) {
+		Boolean result = elfService.deleteElfById(id);
+		if (result) {
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
+	}
+
+	@PostMapping("/elves/{elfId}/assign/{giftId}")
+	public ResponseEntity<ElfDTO> assignGift(@PathVariable Long elfId, @PathVariable Long giftId) {
+		if (elfService.getElfById(elfId) == null || giftService.getGiftById(giftId) == null) {
+			return ResponseEntity.notFound().build();
+		}
+		if (giftService.getGiftById(giftId).getStatus().equals(Status.DELIVERED.toString())) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		}
+		ElfDTO elfDTO = elfService.assignGift(elfId, giftId);
+		return ResponseEntity.ok(elfDTO);
+	}
+
+	/*
+	For Gift and Elves Method, but it will be split after finishing
+	 */
+	private static String getErrors(BindingResult bindingResult) {
+		StringBuilder errors = new StringBuilder();
+		for (FieldError fieldError : bindingResult.getFieldErrors()) {
+			errors.append(fieldError.getField())
+					.append(" - ")
+					.append(fieldError.getDefaultMessage())
+					.append(" / ");
+		}
+		return errors.toString();
 	}
 }

@@ -5,7 +5,6 @@ import Santas_Workshop_API.entity.DTO.gifts.GiftsDTO;
 import Santas_Workshop_API.entity.DTO.gifts.InputGiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.OutputGiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.UpdateInputDTO;
-import Santas_Workshop_API.entity.Gift;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;

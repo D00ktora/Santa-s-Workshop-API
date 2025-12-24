@@ -18,6 +18,4 @@ public interface GiftMapper {
 	OutputGiftDTO fromGiftToOutputGiftDTO(Gift gift);
 	GiftsDTO fromGiftToGiftsDTO(Gift gift);
 	GiftDTO fromGiftToGiftDTO(Gift gift);
-	@Mapping(target ="id", ignore = true)
-	Gift fromGiftToGift(Gift gift);
 }
