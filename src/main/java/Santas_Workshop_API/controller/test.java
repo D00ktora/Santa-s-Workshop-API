@@ -2,10 +2,8 @@ package Santas_Workshop_API.controller;
 
 import Santas_Workshop_API.entity.DTO.elves.ElfDTO;
 import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
-import Santas_Workshop_API.entity.DTO.gifts.GiftsDTO;
-import Santas_Workshop_API.entity.DTO.gifts.InputGiftDTO;
-import Santas_Workshop_API.entity.DTO.gifts.OutputGiftDTO;
-import Santas_Workshop_API.entity.DTO.gifts.UpdateInputDTO;
+import Santas_Workshop_API.entity.DTO.gifts.customValidation.CreateValidation;
+import Santas_Workshop_API.entity.DTO.gifts.customValidation.UpdateValidation;
 import Santas_Workshop_API.entity.enums.gift.Status;
 import Santas_Workshop_API.service.ElfService;
 import Santas_Workshop_API.service.GiftService;
@@ -17,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,14 +38,18 @@ public class test {
 	private final GiftService giftService;
 
 	@PostMapping("/")
-	public ResponseEntity<OutputGiftDTO> forTest(@RequestBody @Valid InputGiftDTO inputGiftDTO, BindingResult bindingResult) {
-		ResponseEntity<OutputGiftDTO> gift = giftService.createGift(inputGiftDTO, bindingResult);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(gift.getBody().getId()).toUri();
-		return ResponseEntity.created(location).body(gift.getBody());
+	public ResponseEntity<GiftDTO> createGift(@RequestBody @Validated(CreateValidation.class) GiftDTO inputGiftDTO, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			String errors = getErrors(bindingResult);
+			return ResponseEntity.badRequest().header("Errors", errors).body(null);
+		}
+		GiftDTO gift = giftService.createGift(inputGiftDTO);
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(gift.getId()).toUri();
+		return ResponseEntity.created(location).body(gift);
 	}
 
 	@GetMapping("/")
-	public Page<GiftsDTO> getGifts(
+	public Page<GiftDTO> getGifts(
 			@RequestParam(required = false) String status,
 			@RequestParam(required = false) String category,
 			@RequestParam(required = false) String wrapped,
@@ -67,7 +70,7 @@ public class test {
 	}
 
 	@PostMapping("/{id}")
-	public ResponseEntity<GiftDTO> updateGift(@PathVariable Long id, @RequestBody @Valid UpdateInputDTO updateInputDTO, BindingResult bindingResult) {
+	public ResponseEntity<GiftDTO> updateGift(@PathVariable Long id, @RequestBody @Validated(UpdateValidation.class) GiftDTO updateInputDTO, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			String errors = getErrors(bindingResult);
 			return ResponseEntity.badRequest().header("Errors", errors).body(null);
