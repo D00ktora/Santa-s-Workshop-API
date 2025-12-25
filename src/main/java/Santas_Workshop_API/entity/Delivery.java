@@ -9,6 +9,7 @@ import jakarta.persistence.OneToMany;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -20,7 +21,7 @@ public class Delivery {
 	private String address;
 	private String recipientName;
 	@OneToMany(mappedBy = "delivery")
-	private Set<Gift> gifts;
+	private Set<Gift> gifts = new HashSet<>();
 	private Status deliveryStatus;
 	private LocalDateTime estimatedArrival;
 }
