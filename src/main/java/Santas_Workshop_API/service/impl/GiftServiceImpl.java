@@ -6,6 +6,7 @@ import Santas_Workshop_API.entity.Delivery;
 import Santas_Workshop_API.entity.Gift;
 import Santas_Workshop_API.entity.enums.gift.Category;
 import Santas_Workshop_API.entity.enums.gift.Status;
+import Santas_Workshop_API.repository.DeliveredGiftsRepository;
 import Santas_Workshop_API.repository.GiftsRepository;
 import Santas_Workshop_API.service.GiftService;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +23,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class GiftServiceImpl implements GiftService {
 
 	private final GiftsRepository giftsRepository;
+	private final DeliveredGiftsRepository deliveredGiftsRepository;
 
 	@Override
 	public GiftDTO createGift(GiftDTO inputGiftDTO) {
@@ -167,5 +168,11 @@ public class GiftServiceImpl implements GiftService {
 		}
 		List<Gift> gifts = giftsRepository.saveAll(allById);
 		return new HashSet<>(gifts);
+	}
+
+	@Override
+	public void setGiftStatusToDelivered(Set<Gift> gifts) {
+		deliveredGiftsRepository.saveAll(gifts);
+		giftsRepository.deleteAll(gifts);
 	}
 }

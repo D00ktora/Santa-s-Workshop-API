@@ -24,4 +24,5 @@ public interface GiftService {
 	Boolean deleteGift(Long id);
 	List<GiftDTO> searchGifts(String searchWord);
 	Set<Gift> setGiftStatusToLoaded(Set<Long> giftIds, Delivery delivery);
+	void setGiftStatusToDelivered(Set<Gift> gifts);
 }

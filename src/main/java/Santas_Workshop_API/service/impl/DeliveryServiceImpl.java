@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -64,7 +66,35 @@ public class DeliveryServiceImpl implements DeliveryService {
 
 	@Override
 	public DeliveryDTO changeStatus(String status, Long id) {
-		return null;
+		//todo : This is not finished. THere is a problem with mapping gifts before removing them from the DB. And in order to save them in the new DB, I need to create additional entity for this DB. Entity needs to contain all of the fields from Gift + both keys in order to have some track + archive LocalDaeTime.
+		Optional<Delivery> byId = deliveryRepository.findById(id);
+		if (byId.isEmpty()) {
+			return null;
+		}
+		Delivery delivery = byId.get();
+		delivery.setDeliveryStatus(Status.DELIVERED);
+		deliveryRepository.save(delivery);
+		Set<Long> giftIds = new HashSet<>();
+		for (Gift gift : delivery.getGifts()) {
+			giftIds.add(gift.getId());
+		}
+		giftService.setGiftStatusToDelivered(delivery.getGifts());
+		DeliveryDTO deliveryDTO = DeliveryMapping.INSTANCE.mapToDeliveryDto(delivery);
+		deliveryDTO.setGifts(giftIds);
+		return deliveryDTO;
+	}
+
+	@Override
+	public DeliveryDTO getDeliveryById(Long id) {
+		Optional<Delivery> byId = deliveryRepository.findById(id);
+		Delivery delivery = deliveryRepository.findById(id).orElse(null);
+		if (delivery == null) {
+			return null;
+		}
+		Set<Long> giftsById = delivery.getGifts().stream().map(Gift::getId).collect(Collectors.toSet());
+		DeliveryDTO deliveryDTO = DeliveryMapping.INSTANCE.mapToDeliveryDto(delivery);
+		deliveryDTO.setGifts(giftsById);
+		return deliveryDTO;
 	}
 
 	private Boolean giftValidation(Set<Long> giftIds) {
