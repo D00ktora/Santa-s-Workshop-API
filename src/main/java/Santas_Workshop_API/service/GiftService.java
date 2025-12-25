@@ -1,10 +1,13 @@
 package Santas_Workshop_API.service;
 
 import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
+import Santas_Workshop_API.entity.Delivery;
+import Santas_Workshop_API.entity.Gift;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Set;
 
 public interface GiftService {
 	GiftDTO createGift(GiftDTO inputGiftDTO);
@@ -20,4 +23,5 @@ public interface GiftService {
 	GiftDTO wrapGift(Long id);
 	Boolean deleteGift(Long id);
 	List<GiftDTO> searchGifts(String searchWord);
+	Set<Gift> setGiftStatusToLoaded(Set<Long> giftIds, Delivery delivery);
 }

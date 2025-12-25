@@ -1,10 +1,12 @@
 package Santas_Workshop_API.controller;
 
+import Santas_Workshop_API.entity.DTO.deliveries.DeliveryDTO;
 import Santas_Workshop_API.entity.DTO.elves.ElfDTO;
 import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.customValidation.CreateValidation;
 import Santas_Workshop_API.entity.DTO.gifts.customValidation.UpdateValidation;
 import Santas_Workshop_API.entity.enums.gift.Status;
+import Santas_Workshop_API.service.DeliveryService;
 import Santas_Workshop_API.service.ElfService;
 import Santas_Workshop_API.service.GiftService;
 import jakarta.validation.Valid;
@@ -180,5 +182,25 @@ public class test {
 					.append(" / ");
 		}
 		return errors.toString();
+	}
+
+
+	/*
+	Here start DeliveryController
+	 */
+
+	private final DeliveryService deliveryService;
+
+	@PostMapping("/delivery")
+	public ResponseEntity<DeliveryDTO> deliver(@RequestBody @Valid DeliveryDTO deliveryDTO, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			String errors = getErrors(bindingResult);
+			return ResponseEntity.badRequest().header("Errors", errors).body(null);
+		}
+		DeliveryDTO deliveryPlan = deliveryService.createDeliveryPlan(deliveryDTO);
+		if (deliveryPlan == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		return ResponseEntity.status(HttpStatus.CREATED).body(deliveryPlan);
 	}
 }

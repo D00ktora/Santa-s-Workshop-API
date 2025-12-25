@@ -2,10 +2,14 @@ package Santas_Workshop_API.entity;
 
 import Santas_Workshop_API.entity.enums.delivery.Status;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -18,10 +22,14 @@ public class Delivery {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@NotBlank
+	@Size(min = 5, max = 120)
 	private String address;
+	@NotBlank
 	private String recipientName;
 	@OneToMany(mappedBy = "delivery")
 	private Set<Gift> gifts = new HashSet<>();
-	private Status deliveryStatus;
-	private LocalDateTime estimatedArrival;
+	@Enumerated(EnumType.STRING)
+	private Status deliveryStatus = Status.PLANNED;
+	private LocalDateTime estimatedArrival = LocalDateTime.now().plusDays(3);
 }

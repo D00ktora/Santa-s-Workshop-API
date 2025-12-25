@@ -9,8 +9,11 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface DeliveryMapping {
 	DeliveryMapping INSTANCE = Mappers.getMapper(DeliveryMapping.class);
-	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "gifts", ignore = true)
 	DeliveryDTO mapToDeliveryDto(Delivery delivery);
+	@Mapping(target = "gifts", ignore = true)
+	@Mapping(target = "estimatedArrival", ignore = true)
+	@Mapping(target = "deliveryStatus", ignore = true)
+	@Mapping(target = "id", ignore = true)
 	Delivery mapToDelivery(DeliveryDTO deliveryDTO);
 }
