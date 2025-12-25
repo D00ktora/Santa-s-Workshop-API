@@ -203,4 +203,13 @@ public class test {
 		}
 		return ResponseEntity.status(HttpStatus.CREATED).body(deliveryPlan);
 	}
+
+	@GetMapping("/deliveries")
+	public ResponseEntity<List<DeliveryDTO>> getDeliveryPlan(
+			@RequestParam(required = false) String deliveryStatus,
+			@RequestParam(required = false) String recipientName
+	) {
+		List<DeliveryDTO> allDeliveries = deliveryService.getAllDeliveries(deliveryStatus, recipientName);
+		return ResponseEntity.ok(allDeliveries);
+	}
 }
