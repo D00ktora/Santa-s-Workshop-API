@@ -95,7 +95,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 				throw new NotFoundException("Gift with id " + id + " not found");
 			}
 			if (giftById.getStatus().equals(Santas_Workshop_API.entity.enums.gift.Status.PENDING.toString())) {
-				throw new ConflictException("Gift with id " + id + " is already pending");
+				throw new ConflictException("Gift with id " + id + " is not ready");
 			}
 			if (giftById.getStatus().equals(Santas_Workshop_API.entity.enums.gift.Status.DELIVERED.toString())) {
 				throw new ConflictException("Gift with id " + id + " is already delivered");
@@ -122,6 +122,9 @@ public class DeliveryServiceImpl implements DeliveryService {
 
 	private Status checkAndGetDeliveryStatus(String deliveryStatus, Delivery delivery) throws BadRequestException {
 		if (delivery.getDeliveryStatus().equals(Status.PLANNED) && (deliveryStatus.equals("DELIVERED") || deliveryStatus.equals("IN_TRANSIT") || deliveryStatus.equals("FAILED"))) {
+			//todo: If status is set to Failed then gifts needs to be changed from Loaded to Ready.
+			//todo And gift must be removed from Delivery and put in gift repository.
+			//todo And delivery must be deleted after that.
 			switch (deliveryStatus){
 				case "DELIVERED": return Status.DELIVERED;
 				case "IN_TRANSIT": return Status.IN_TRANSIT;
@@ -129,12 +132,18 @@ public class DeliveryServiceImpl implements DeliveryService {
 			}
 		}
 		if (delivery.getDeliveryStatus().equals(Status.IN_TRANSIT) && (deliveryStatus.equals("DELIVERED") || deliveryStatus.equals("FAILED"))) {
+			//todo: If status is set to Failed then gifts needs to be changed from Loaded to Ready.
+			//todo And gift must be removed from Delivery and put in gift repository.
+			//todo And delivery must be deleted after that.
 			switch (deliveryStatus) {
 				case "DELIVERED": return Status.DELIVERED;
 				case "FAILED": return Status.FAILED;
 			}
 		}
 		if (delivery.getDeliveryStatus().equals(Status.DELIVERED) && deliveryStatus.equals("FAILED")) {
+			//todo: If status is set to Failed then gifts needs to be changed from Loaded to Ready.
+			//todo And gift must be removed from Delivery and put in gift repository.
+			//todo And delivery must be deleted after that.
 			return Status.FAILED;
 		}
 		throw new BadRequestException("Delivery Status cannot be " + deliveryStatus);
