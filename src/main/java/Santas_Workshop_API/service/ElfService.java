@@ -8,6 +8,6 @@ public interface ElfService {
 	ElfDTO createElf(ElfDTO elfDTO);
 	List<ElfDTO> getAllElves();
 	ElfDTO getElfById(Long id);
-	Boolean deleteElfById(Long id);
+	void deleteElfById(Long id);
 	ElfDTO assignGift(Long id, Long giftId);
 }

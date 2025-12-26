@@ -1,9 +1,9 @@
 package Santas_Workshop_API.service;
 
+import Santas_Workshop_API.config.errorHandling.exceptions.BadRequestException;
 import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
 import Santas_Workshop_API.entity.Delivery;
 import Santas_Workshop_API.entity.Gift;
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -21,8 +21,8 @@ public interface GiftService {
 	GiftDTO getGiftById(Long id);
 	GiftDTO updateGift(Long id, GiftDTO updateInputDTO);
 	GiftDTO wrapGift(Long id);
-	Boolean deleteGift(Long id);
-	List<GiftDTO> searchGifts(String searchWord);
+	void deleteGift(Long id);
+	List<GiftDTO> searchGifts(String searchWord) throws BadRequestException;
 	Set<Gift> setGiftStatusToLoaded(Set<Long> giftIds, Delivery delivery);
 	void setGiftStatusToDelivered(Set<Gift> gifts);
 }
