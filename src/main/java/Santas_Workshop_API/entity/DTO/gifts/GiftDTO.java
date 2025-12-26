@@ -3,7 +3,6 @@ package Santas_Workshop_API.entity.DTO.gifts;
 import Santas_Workshop_API.entity.DTO.gifts.customValidation.CategoryValidation;
 import Santas_Workshop_API.entity.DTO.gifts.customValidation.CreateValidation;
 import Santas_Workshop_API.entity.DTO.gifts.customValidation.IsWrappedValidation;
-import Santas_Workshop_API.entity.DTO.gifts.customValidation.StatusValidation;
 import Santas_Workshop_API.entity.DTO.gifts.customValidation.UpdateValidation;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.constraints.Max;
@@ -42,8 +41,6 @@ public class GiftDTO {
 	@IsWrappedValidation (groups = {CreateValidation.class, UpdateValidation.class})
 	private String isWrapped;
 
-	@NotBlank(groups = UpdateValidation.class)
-	@StatusValidation (groups = UpdateValidation.class)
 	private String status;
 
 	private LocalDateTime createdAt;

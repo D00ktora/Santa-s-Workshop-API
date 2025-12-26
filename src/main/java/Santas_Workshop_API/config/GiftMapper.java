@@ -12,6 +12,7 @@ public interface GiftMapper {
 	GiftDTO fromGiftToGiftDTO(Gift gift);
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "elf", ignore = true)
+	@Mapping(target = "status", ignore = true)
 	@Mapping(target = "isWrapped", expression = "java(giftDTO.getIsWrapped() == null || giftDTO.getIsWrapped().equals(\"false\") ? false : true)")
 	@Mapping(target = "createdAt", ignore = true)
 	Gift fromGiftDtoToGift(GiftDTO giftDTO);

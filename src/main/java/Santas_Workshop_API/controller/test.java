@@ -1,10 +1,12 @@
 package Santas_Workshop_API.controller;
 
+import Santas_Workshop_API.entity.DTO.deliveries.DeliveryDTO;
 import Santas_Workshop_API.entity.DTO.elves.ElfDTO;
 import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.customValidation.CreateValidation;
 import Santas_Workshop_API.entity.DTO.gifts.customValidation.UpdateValidation;
 import Santas_Workshop_API.entity.enums.gift.Status;
+import Santas_Workshop_API.service.DeliveryService;
 import Santas_Workshop_API.service.ElfService;
 import Santas_Workshop_API.service.GiftService;
 import jakarta.validation.Valid;
@@ -18,6 +20,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -180,5 +183,55 @@ public class test {
 					.append(" / ");
 		}
 		return errors.toString();
+	}
+
+
+	/*
+	Here start DeliveryController
+	 */
+
+	private final DeliveryService deliveryService;
+
+	@PostMapping("/delivery")
+	public ResponseEntity<DeliveryDTO> deliver(@RequestBody @Valid DeliveryDTO deliveryDTO, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			String errors = getErrors(bindingResult);
+			return ResponseEntity.badRequest().header("Errors", errors).body(null);
+		}
+		DeliveryDTO deliveryPlan = deliveryService.createDeliveryPlan(deliveryDTO);
+		if (deliveryPlan == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		return ResponseEntity.status(HttpStatus.CREATED).body(deliveryPlan);
+	}
+
+	@GetMapping("/deliveries")
+	public ResponseEntity<List<DeliveryDTO>> getDeliveryPlan(
+			@RequestParam(required = false) String deliveryStatus,
+			@RequestParam(required = false) String recipientName
+	) {
+		List<DeliveryDTO> allDeliveries = deliveryService.getAllDeliveries(deliveryStatus, recipientName);
+		return ResponseEntity.ok(allDeliveries);
+	}
+
+	@PatchMapping("/deliveries/{id}/")
+	public ResponseEntity<DeliveryDTO> updateDelivery(@PathVariable Long id, @RequestParam String deliveryStatus) {
+		if (deliveryStatus == null || deliveryStatus.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Errors", "Delivery Status must be : PLANNED, IN_TRANSIT, DELIVERED or FAILED").body(null);
+		}
+		if (deliveryService.getDeliveryById(id) == null){
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).header("Errors", "Delivery does not exist").body(null);
+		}
+		DeliveryDTO deliveryById = deliveryService.getDeliveryById(id);
+		if (deliveryById.getDeliveryStatus().equals("PLANNED") && (deliveryStatus.equals("DELIVERED") || deliveryStatus.equals("IN_TRANSIT") || deliveryStatus.equals("FAILED"))) {
+			return ResponseEntity.ok(deliveryService.changeStatus(deliveryStatus, id));
+		}
+		if (deliveryById.getDeliveryStatus().equals("DELIVERED") && (deliveryStatus.equals("IN_TRANSIT") || deliveryStatus.equals("FAILED"))) {
+			return ResponseEntity.ok(deliveryService.changeStatus(deliveryStatus, id));
+		}
+		if (deliveryById.getDeliveryStatus().equals("IN_TRANSIT") && deliveryStatus.equals("FAILED")) {
+			return ResponseEntity.ok(deliveryService.changeStatus(deliveryStatus, id));
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).header("Errors", "Delivery Status not correct. Delivery cannot change status from " + deliveryStatus + " to " + deliveryById.getDeliveryStatus()).body(null);
 	}
 }

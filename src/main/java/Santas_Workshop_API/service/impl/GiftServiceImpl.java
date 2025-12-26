@@ -2,9 +2,11 @@ package Santas_Workshop_API.service.impl;
 
 import Santas_Workshop_API.config.GiftMapper;
 import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
+import Santas_Workshop_API.entity.Delivery;
 import Santas_Workshop_API.entity.Gift;
 import Santas_Workshop_API.entity.enums.gift.Category;
 import Santas_Workshop_API.entity.enums.gift.Status;
+import Santas_Workshop_API.repository.DeliveredGiftsRepository;
 import Santas_Workshop_API.repository.GiftsRepository;
 import Santas_Workshop_API.service.GiftService;
 import lombok.RequiredArgsConstructor;
@@ -17,18 +19,24 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class GiftServiceImpl implements GiftService {
 
 	private final GiftsRepository giftsRepository;
+	private final DeliveredGiftsRepository deliveredGiftsRepository;
 
 	@Override
 	public GiftDTO createGift(GiftDTO inputGiftDTO) {
 		Gift createdGift = GiftMapper.INSTANCE.fromGiftDtoToGift(inputGiftDTO);
+		if (inputGiftDTO.getIsWrapped().equals("true")) {
+			createdGift.setStatus(Status.READY);
+		}
 		Gift savedGift = giftsRepository.save(createdGift);
 		return GiftMapper.INSTANCE.fromGiftToGiftDTO(savedGift);
 	}
@@ -54,7 +62,6 @@ public class GiftServiceImpl implements GiftService {
 			return null;
 		}
 		gift.setName(updateInputDTO.getName());
-		updateGiftStatus(updateInputDTO, gift);
 		updateGiftCategory(updateInputDTO, gift);
 		updateWrap(updateInputDTO, gift);
 		gift.setTargetAge(updateInputDTO.getTargetAge());
@@ -68,6 +75,7 @@ public class GiftServiceImpl implements GiftService {
 		Gift gift = giftsRepository.findById(id).orElse(null);
 		if (gift == null) return null;
 		gift.setIsWrapped(true);
+		gift.setStatus(Status.READY);
 		Gift saved = giftsRepository.save(gift);
 		return GiftMapper.INSTANCE.fromGiftToGiftDTO(saved);
 	}
@@ -144,28 +152,27 @@ public class GiftServiceImpl implements GiftService {
 		}
 	}
 
-	private static void updateGiftStatus(GiftDTO updateInputDTO, Gift gift) {
-		switch (updateInputDTO.getStatus()){
-			case "PENDING":
-				gift.setStatus(Status.PENDING);
-				break;
-			case "READY":
-				gift.setStatus(Status.READY);
-				break;
-			case "LOADED":
-				gift.setStatus(Status.LOADED);
-				break;
-			case "DELIVERED":
-				gift.setStatus(Status.DELIVERED);
-				break;
-		}
-	}
-
 	private static void updateWrap(GiftDTO updateInputDTO, Gift gift) {
 		if (updateInputDTO.getIsWrapped().equals("true")) {
 			gift.setIsWrapped(true);
 		} else if (updateInputDTO.getIsWrapped().equals("false")) {
 			gift.setIsWrapped(false);
 		}
+	}
+
+	public Set<Gift> setGiftStatusToLoaded(Set<Long> giftIds, Delivery delivery) {
+		List<Gift> allById = giftsRepository.findAllById(giftIds);
+		for (Gift gift : allById) {
+			gift.setStatus(Status.LOADED);
+			gift.setDelivery(delivery);
+		}
+		List<Gift> gifts = giftsRepository.saveAll(allById);
+		return new HashSet<>(gifts);
+	}
+
+	@Override
+	public void setGiftStatusToDelivered(Set<Gift> gifts) {
+		deliveredGiftsRepository.saveAll(gifts);
+		giftsRepository.deleteAll(gifts);
 	}
 }
