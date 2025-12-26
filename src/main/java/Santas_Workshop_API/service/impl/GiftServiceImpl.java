@@ -1,6 +1,8 @@
 package Santas_Workshop_API.service.impl;
 
 import Santas_Workshop_API.config.GiftMapper;
+import Santas_Workshop_API.config.errorHandling.exceptions.BadRequestException;
+import Santas_Workshop_API.config.errorHandling.exceptions.NotFoundException;
 import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
 import Santas_Workshop_API.entity.Delivery;
 import Santas_Workshop_API.entity.Gift;
@@ -10,7 +12,6 @@ import Santas_Workshop_API.repository.DeliveredGiftsRepository;
 import Santas_Workshop_API.repository.GiftsRepository;
 import Santas_Workshop_API.service.GiftService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -51,29 +52,24 @@ public class GiftServiceImpl implements GiftService {
 
 	@Override
 	public GiftDTO getGiftById(Long id) {
-		Optional<Gift> gift = giftsRepository.findById(id);
-		return gift.map(GiftMapper.INSTANCE::fromGiftToGiftDTO).orElse(null);
+		Gift gift = giftsRepository.findById(id).orElseThrow(() -> new NotFoundException("Gift with id " + id + " is not found"));
+		return GiftMapper.INSTANCE.fromGiftToGiftDTO(gift);
 	}
 
 	@Override
 	public GiftDTO updateGift(Long id, GiftDTO updateInputDTO) {
-		Gift gift = giftsRepository.findById(id).orElse(null);
-		if (gift == null) {
-			return null;
-		}
+		Gift gift = giftsRepository.findById(id).orElseThrow(() -> new NotFoundException("Gift with id " + id + " is not found"));
 		gift.setName(updateInputDTO.getName());
 		updateGiftCategory(updateInputDTO, gift);
 		updateWrap(updateInputDTO, gift);
 		gift.setTargetAge(updateInputDTO.getTargetAge());
-
 		Gift save = giftsRepository.save(gift);
 		return GiftMapper.INSTANCE.fromGiftToGiftDTO(save);
 	}
 
 	@Override
 	public GiftDTO wrapGift(Long id) {
-		Gift gift = giftsRepository.findById(id).orElse(null);
-		if (gift == null) return null;
+		Gift gift = giftsRepository.findById(id).orElseThrow(() -> new NotFoundException("Gift with id " + id + " is not found"));
 		gift.setIsWrapped(true);
 		gift.setStatus(Status.READY);
 		Gift saved = giftsRepository.save(gift);
@@ -81,17 +77,17 @@ public class GiftServiceImpl implements GiftService {
 	}
 
 	@Override
-	public Boolean deleteGift(Long id) {
-		Gift gift = giftsRepository.findById(id).orElse(null);
-		if (gift == null) return false;
+	public void deleteGift(Long id) {
+		Gift gift = giftsRepository.findById(id).orElseThrow(() -> new NotFoundException("Gift with id " + id + " is not found"));
 		giftsRepository.delete(gift);
-		return true;
 	}
 
 	@Override
-	public List<GiftDTO> searchGifts(String searchWord) {
+	public List<GiftDTO> searchGifts(String searchWord) throws BadRequestException {
+		if (searchWord == null || searchWord.isBlank() || searchWord.isEmpty()) {
+			throw new BadRequestException("Search word is not full");
+		}
 		List<Gift> giftsByName = giftsRepository.findByNameContainingIgnoreCase(searchWord);
-		if (giftsByName == null) return null;
 		List<GiftDTO> giftDTOS = new ArrayList<>();
 		for (Gift gift : giftsByName) {
 			giftDTOS.add(GiftMapper.INSTANCE.fromGiftToGiftDTO(gift));
@@ -101,14 +97,14 @@ public class GiftServiceImpl implements GiftService {
 
 	private static Pageable createPageable(int page, int size, String sort) throws BadRequestException {
 		if (page < 0) {
-			throw new BadRequestException();
+			throw new BadRequestException("Page number cannot be less than zero");
 		}
 		if (size <= 0) {
-			throw new BadRequestException();
+			throw new BadRequestException("Size cannot be less than zero");
 		}
 		if (!sort.equals("createdAt")) {
 			if (!sort.equals("name")) {
-				throw new BadRequestException();
+				throw new BadRequestException("Sort is invalid");
 			}
 		}
 		Sort sortingClass = Sort.by(Sort.Direction.DESC, sort);
@@ -155,11 +151,14 @@ public class GiftServiceImpl implements GiftService {
 	private static void updateWrap(GiftDTO updateInputDTO, Gift gift) {
 		if (updateInputDTO.getIsWrapped().equals("true")) {
 			gift.setIsWrapped(true);
+			gift.setStatus(Status.READY);
 		} else if (updateInputDTO.getIsWrapped().equals("false")) {
 			gift.setIsWrapped(false);
+			gift.setStatus(Status.PENDING);
 		}
 	}
 
+	@Override
 	public Set<Gift> setGiftStatusToLoaded(Set<Long> giftIds, Delivery delivery) {
 		List<Gift> allById = giftsRepository.findAllById(giftIds);
 		for (Gift gift : allById) {

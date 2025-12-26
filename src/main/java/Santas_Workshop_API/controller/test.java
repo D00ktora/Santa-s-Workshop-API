@@ -1,17 +1,16 @@
 package Santas_Workshop_API.controller;
 
+import Santas_Workshop_API.config.errorHandling.exceptions.BadRequestException;
 import Santas_Workshop_API.entity.DTO.deliveries.DeliveryDTO;
 import Santas_Workshop_API.entity.DTO.elves.ElfDTO;
 import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
 import Santas_Workshop_API.entity.DTO.gifts.customValidation.CreateValidation;
 import Santas_Workshop_API.entity.DTO.gifts.customValidation.UpdateValidation;
-import Santas_Workshop_API.entity.enums.gift.Status;
 import Santas_Workshop_API.service.DeliveryService;
 import Santas_Workshop_API.service.ElfService;
 import Santas_Workshop_API.service.GiftService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,11 +40,9 @@ public class test {
 	private final GiftService giftService;
 
 	@PostMapping("/")
-	public ResponseEntity<GiftDTO> createGift(@RequestBody @Validated(CreateValidation.class) GiftDTO inputGiftDTO, BindingResult bindingResult) {
+	public ResponseEntity<GiftDTO> createGift(@RequestBody @Validated(CreateValidation.class) GiftDTO inputGiftDTO, BindingResult bindingResult) throws BadRequestException {
 		if (bindingResult.hasErrors()) {
-			String errors = getErrors(bindingResult);
-			return ResponseEntity.badRequest().header("Errors", errors).body(null);
-		}
+			throw new BadRequestException(getErrors(bindingResult));}
 		GiftDTO gift = giftService.createGift(inputGiftDTO);
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(gift.getId()).toUri();
 		return ResponseEntity.created(location).body(gift);
@@ -66,46 +63,32 @@ public class test {
 	@GetMapping("/{id}")
 	public ResponseEntity<GiftDTO> getGift(@PathVariable Long id) {
 		GiftDTO giftById = giftService.getGiftById(id);
-		if (giftById == null) {
-			return ResponseEntity.notFound().build();
-		}
 		return ResponseEntity.ok(giftById);
 	}
 
 	@PostMapping("/{id}")
-	public ResponseEntity<GiftDTO> updateGift(@PathVariable Long id, @RequestBody @Validated(UpdateValidation.class) GiftDTO updateInputDTO, BindingResult bindingResult) {
+	public ResponseEntity<GiftDTO> updateGift(@PathVariable Long id, @RequestBody @Validated(UpdateValidation.class) GiftDTO updateInputDTO, BindingResult bindingResult) throws BadRequestException {
 		if (bindingResult.hasErrors()) {
-			String errors = getErrors(bindingResult);
-			return ResponseEntity.badRequest().header("Errors", errors).body(null);
+			throw new BadRequestException(getErrors(bindingResult));
 		}
-
 		GiftDTO giftDTO = giftService.updateGift(id, updateInputDTO);
-		if (giftDTO == null) {
-			return ResponseEntity.notFound().build();
-		}
 		return ResponseEntity.ok(giftDTO);
 	}
 
 	@PutMapping("/{id}/wrap")
 	public ResponseEntity<GiftDTO> wrapGift(@PathVariable Long id) {
 		GiftDTO giftDTO = giftService.wrapGift(id);
-		if (giftDTO == null) {
-			return ResponseEntity.notFound().build();
-		}
 		return ResponseEntity.ok(giftDTO);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteGift(@PathVariable Long id) {
-		Boolean deleted = giftService.deleteGift(id);
-		if (deleted) {
-			return ResponseEntity.noContent().build();
-		}
-		return ResponseEntity.notFound().build();
+	public ResponseEntity<GiftDTO> deleteGift(@PathVariable Long id) {
+		giftService.deleteGift(id);
+		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping("/search{query}")
-	public ResponseEntity<List<GiftDTO>> searchGifts(@RequestParam String query) {
+	@GetMapping("/search")
+	public ResponseEntity<List<GiftDTO>> searchGifts(@RequestParam String query) throws BadRequestException {
 		return ResponseEntity.ok(giftService.searchGifts(query));
 
 	}
@@ -123,50 +106,34 @@ public class test {
 	private final ElfService elfService;
 
 	@PostMapping("/elves")
-	public ResponseEntity<ElfDTO> createElf(@RequestBody @Valid ElfDTO elfDTO, BindingResult bindingResult) {
+	public ResponseEntity<ElfDTO> createElf(@RequestBody @Valid ElfDTO elfDTO, BindingResult bindingResult) throws BadRequestException {
 		if (bindingResult.hasErrors()) {
-			String errors = getErrors(bindingResult);
-			return ResponseEntity.badRequest().header("Errors", errors).body(null);
+			throw new BadRequestException(getErrors(bindingResult));
 		}
 		return ResponseEntity.ok(elfService.createElf(elfDTO));
 	}
 
 
 	@GetMapping("/elves")
-	public ResponseEntity<List<ElfDTO>> getElfs() {
+	public ResponseEntity<List<ElfDTO>> getElves() {
 		List<ElfDTO> allElves = elfService.getAllElves();
-		if (allElves.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
 		return ResponseEntity.ok(allElves);
 	}
 
 	@GetMapping("/elves/{id}")
 	public ResponseEntity<ElfDTO> getElf(@PathVariable Long id) {
 		ElfDTO elfDTO = elfService.getElfById(id);
-		if (elfDTO == null) {
-			return ResponseEntity.notFound().build();
-		}
 		return ResponseEntity.ok(elfDTO);
 	}
 
 	@DeleteMapping("/elves/{id}")
-	public ResponseEntity<?> deleteElf(@PathVariable Long id) {
-		Boolean result = elfService.deleteElfById(id);
-		if (result) {
-			return ResponseEntity.noContent().build();
-		}
-		return ResponseEntity.notFound().build();
+	public ResponseEntity<ElfDTO> deleteElf(@PathVariable Long id) {
+		elfService.deleteElfById(id);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@PostMapping("/elves/{elfId}/assign/{giftId}")
 	public ResponseEntity<ElfDTO> assignGift(@PathVariable Long elfId, @PathVariable Long giftId) {
-		if (elfService.getElfById(elfId) == null || giftService.getGiftById(giftId) == null) {
-			return ResponseEntity.notFound().build();
-		}
-		if (giftService.getGiftById(giftId).getStatus().equals(Status.DELIVERED.toString())) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-		}
 		ElfDTO elfDTO = elfService.assignGift(elfId, giftId);
 		return ResponseEntity.ok(elfDTO);
 	}
@@ -193,15 +160,11 @@ public class test {
 	private final DeliveryService deliveryService;
 
 	@PostMapping("/delivery")
-	public ResponseEntity<DeliveryDTO> deliver(@RequestBody @Valid DeliveryDTO deliveryDTO, BindingResult bindingResult) {
+	public ResponseEntity<DeliveryDTO> deliver(@RequestBody @Valid DeliveryDTO deliveryDTO, BindingResult bindingResult) throws BadRequestException {
 		if (bindingResult.hasErrors()) {
-			String errors = getErrors(bindingResult);
-			return ResponseEntity.badRequest().header("Errors", errors).body(null);
+			throw new BadRequestException(getErrors(bindingResult));
 		}
 		DeliveryDTO deliveryPlan = deliveryService.createDeliveryPlan(deliveryDTO);
-		if (deliveryPlan == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
 		return ResponseEntity.status(HttpStatus.CREATED).body(deliveryPlan);
 	}
 
@@ -215,23 +178,10 @@ public class test {
 	}
 
 	@PatchMapping("/deliveries/{id}/")
-	public ResponseEntity<DeliveryDTO> updateDelivery(@PathVariable Long id, @RequestParam String deliveryStatus) {
+	public ResponseEntity<DeliveryDTO> updateDelivery(@PathVariable Long id, @RequestParam String deliveryStatus) throws BadRequestException {
 		if (deliveryStatus == null || deliveryStatus.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Errors", "Delivery Status must be : PLANNED, IN_TRANSIT, DELIVERED or FAILED").body(null);
+			throw new BadRequestException("Delivery Status must be : PLANNED, IN_TRANSIT, DELIVERED or FAILED");
 		}
-		if (deliveryService.getDeliveryById(id) == null){
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).header("Errors", "Delivery does not exist").body(null);
-		}
-		DeliveryDTO deliveryById = deliveryService.getDeliveryById(id);
-		if (deliveryById.getDeliveryStatus().equals("PLANNED") && (deliveryStatus.equals("DELIVERED") || deliveryStatus.equals("IN_TRANSIT") || deliveryStatus.equals("FAILED"))) {
-			return ResponseEntity.ok(deliveryService.changeStatus(deliveryStatus, id));
-		}
-		if (deliveryById.getDeliveryStatus().equals("DELIVERED") && (deliveryStatus.equals("IN_TRANSIT") || deliveryStatus.equals("FAILED"))) {
-			return ResponseEntity.ok(deliveryService.changeStatus(deliveryStatus, id));
-		}
-		if (deliveryById.getDeliveryStatus().equals("IN_TRANSIT") && deliveryStatus.equals("FAILED")) {
-			return ResponseEntity.ok(deliveryService.changeStatus(deliveryStatus, id));
-		}
-		return ResponseEntity.status(HttpStatus.CONFLICT).header("Errors", "Delivery Status not correct. Delivery cannot change status from " + deliveryStatus + " to " + deliveryById.getDeliveryStatus()).body(null);
+		return ResponseEntity.ok(deliveryService.changeStatus(deliveryStatus, id));
 	}
 }

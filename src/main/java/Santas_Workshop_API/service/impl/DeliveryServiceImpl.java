@@ -1,20 +1,20 @@
 package Santas_Workshop_API.service.impl;
 
 import Santas_Workshop_API.config.DeliveryMapping;
+import Santas_Workshop_API.config.errorHandling.exceptions.BadRequestException;
+import Santas_Workshop_API.config.errorHandling.exceptions.ConflictException;
+import Santas_Workshop_API.config.errorHandling.exceptions.NotFoundException;
 import Santas_Workshop_API.entity.DTO.deliveries.DeliveryDTO;
 import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
 import Santas_Workshop_API.entity.Delivery;
 import Santas_Workshop_API.entity.Gift;
 import Santas_Workshop_API.entity.enums.delivery.Status;
-import Santas_Workshop_API.repository.DeliveredGiftsRepository;
 import Santas_Workshop_API.repository.DeliveryRepository;
 import Santas_Workshop_API.service.DeliveryService;
 import Santas_Workshop_API.service.GiftService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,14 +28,11 @@ import java.util.stream.Collectors;
 @Service
 public class DeliveryServiceImpl implements DeliveryService {
 	private final DeliveryRepository deliveryRepository;
-	private final DeliveredGiftsRepository deliveredGiftsRepository;
 	private final GiftService giftService;
 
 	@Override
-	public DeliveryDTO createDeliveryPlan(DeliveryDTO deliveryDTO) {
-		if (!giftValidation(deliveryDTO.getGifts())) {
-			return null;
-		}
+	public DeliveryDTO createDeliveryPlan(DeliveryDTO deliveryDTO) throws BadRequestException {
+		giftValidation(deliveryDTO.getGifts());
 		Delivery delivery = DeliveryMapping.INSTANCE.mapToDelivery(deliveryDTO);
 		Delivery savedDelivery = deliveryRepository.save(delivery);
 		Set<Gift> gifts = giftService.setGiftStatusToLoaded(deliveryDTO.getGifts(), savedDelivery);
@@ -65,14 +62,9 @@ public class DeliveryServiceImpl implements DeliveryService {
 	}
 
 	@Override
-	public DeliveryDTO changeStatus(String status, Long id) {
-		//todo : This is not finished. THere is a problem with mapping gifts before removing them from the DB. And in order to save them in the new DB, I need to create additional entity for this DB. Entity needs to contain all of the fields from Gift + both keys in order to have some track + archive LocalDaeTime.
-		Optional<Delivery> byId = deliveryRepository.findById(id);
-		if (byId.isEmpty()) {
-			return null;
-		}
-		Delivery delivery = byId.get();
-		delivery.setDeliveryStatus(Status.DELIVERED);
+	public DeliveryDTO changeStatus(String status, Long id) throws BadRequestException {
+		Delivery delivery = deliveryRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Delivery with id %s not found", id)));
+		delivery.setDeliveryStatus(checkAndGetDeliveryStatus(status, delivery));
 		deliveryRepository.save(delivery);
 		Set<Long> giftIds = new HashSet<>();
 		for (Gift gift : delivery.getGifts()) {
@@ -86,34 +78,32 @@ public class DeliveryServiceImpl implements DeliveryService {
 
 	@Override
 	public DeliveryDTO getDeliveryById(Long id) {
-		Optional<Delivery> byId = deliveryRepository.findById(id);
-		Delivery delivery = deliveryRepository.findById(id).orElse(null);
-		if (delivery == null) {
-			return null;
-		}
+		Delivery delivery = deliveryRepository.findById(id).orElseThrow(() -> new NotFoundException("Delivery with id " + id + " not found"));
 		Set<Long> giftsById = delivery.getGifts().stream().map(Gift::getId).collect(Collectors.toSet());
 		DeliveryDTO deliveryDTO = DeliveryMapping.INSTANCE.mapToDeliveryDto(delivery);
 		deliveryDTO.setGifts(giftsById);
 		return deliveryDTO;
 	}
 
-	private Boolean giftValidation(Set<Long> giftIds) {
+	private void giftValidation(Set<Long> giftIds) throws BadRequestException {
 		if (giftIds.isEmpty()) {
-			return false;
+			throw new BadRequestException("Gifts cannot be empty");
 		}
 		for (Long id : giftIds) {
 			GiftDTO giftById = giftService.getGiftById(id);
 			if (giftById == null) {
-				return false;
+				throw new NotFoundException("Gift with id " + id + " not found");
 			}
-			if (
-					giftById.getStatus().equals(Santas_Workshop_API.entity.enums.gift.Status.PENDING.toString()) ||
-					giftById.getStatus().equals(Santas_Workshop_API.entity.enums.gift.Status.DELIVERED.toString()) ||
-					giftById.getStatus().equals(Santas_Workshop_API.entity.enums.gift.Status.LOADED.toString())) {
-				return false;
+			if (giftById.getStatus().equals(Santas_Workshop_API.entity.enums.gift.Status.PENDING.toString())) {
+				throw new ConflictException("Gift with id " + id + " is already pending");
+			}
+			if (giftById.getStatus().equals(Santas_Workshop_API.entity.enums.gift.Status.DELIVERED.toString())) {
+				throw new ConflictException("Gift with id " + id + " is already delivered");
+			}
+			if (giftById.getStatus().equals(Santas_Workshop_API.entity.enums.gift.Status.LOADED.toString())) {
+				throw new ConflictException("Gift with id " + id + " is already loaded");
 			}
 		}
-		return true;
 	}
 
 	private static Specification<Delivery> createSortSpecifications(String deliveryStatus, String recipientName) {
@@ -128,5 +118,25 @@ public class DeliveryServiceImpl implements DeliveryService {
 
 		}
 		return specification;
+	}
+
+	private Status checkAndGetDeliveryStatus(String deliveryStatus, Delivery delivery) throws BadRequestException {
+		if (delivery.getDeliveryStatus().equals(Status.PLANNED) && (deliveryStatus.equals("DELIVERED") || deliveryStatus.equals("IN_TRANSIT") || deliveryStatus.equals("FAILED"))) {
+			switch (deliveryStatus){
+				case "DELIVERED": return Status.DELIVERED;
+				case "IN_TRANSIT": return Status.IN_TRANSIT;
+				case "FAILED": return Status.FAILED;
+			}
+		}
+		if (delivery.getDeliveryStatus().equals(Status.IN_TRANSIT) && (deliveryStatus.equals("DELIVERED") || deliveryStatus.equals("FAILED"))) {
+			switch (deliveryStatus) {
+				case "DELIVERED": return Status.DELIVERED;
+				case "FAILED": return Status.FAILED;
+			}
+		}
+		if (delivery.getDeliveryStatus().equals(Status.DELIVERED) && deliveryStatus.equals("FAILED")) {
+			return Status.FAILED;
+		}
+		throw new BadRequestException("Delivery Status cannot be " + deliveryStatus);
 	}
 }
