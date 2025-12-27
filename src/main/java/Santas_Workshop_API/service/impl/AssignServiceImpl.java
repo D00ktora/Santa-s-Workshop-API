@@ -1,9 +1,11 @@
 package Santas_Workshop_API.service.impl;
 
 import Santas_Workshop_API.config.ElfMapper;
+import Santas_Workshop_API.config.GiftMapper;
 import Santas_Workshop_API.config.errorHandling.exceptions.ConflictException;
 import Santas_Workshop_API.config.errorHandling.exceptions.NotFoundException;
 import Santas_Workshop_API.entity.DTO.elves.ElfDTO;
+import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
 import Santas_Workshop_API.entity.Elf;
 import Santas_Workshop_API.entity.Gift;
 import Santas_Workshop_API.entity.enums.gift.Status;
@@ -12,6 +14,9 @@ import Santas_Workshop_API.repository.GiftsRepository;
 import Santas_Workshop_API.service.AssignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -36,6 +41,14 @@ public class AssignServiceImpl implements AssignService {
 		elf.getAssignedGiftIds().add(gift);
 		elf.setAssignedGiftIds(elf.getAssignedGiftIds());
 		Elf save = elfRepository.save(elf);
-		return ElfMapper.INSTANCE.fromElfToElfDTO(save);
+		ElfDTO elfDTO = ElfMapper.INSTANCE.fromElfToElfDTO(save);
+		List<Gift> assignedGiftIds = save.getAssignedGiftIds();
+		List<GiftDTO> elfGifts = new ArrayList<>();
+		for (Gift assignedGiftId : assignedGiftIds) {
+			GiftDTO giftDTO = GiftMapper.INSTANCE.fromGiftToGiftDTO(assignedGiftId);
+			elfGifts.add(giftDTO);
+		}
+		elfDTO.setAssignedGiftIds(elfGifts);
+		return elfDTO;
 	}
 }

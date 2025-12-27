@@ -142,7 +142,17 @@ public class DeliveryServiceImpl implements DeliveryService {
 				case "FAILED": return Status.FAILED;
 			}
 		}
-		throw new BadRequestException("Delivery Status cannot be " + deliveryStatus);
+
+		if (deliveryStatus.equals("PLANNED")) {
+			if (delivery.getDeliveryStatus().equals(Status.IN_TRANSIT)) {
+				throw new BadRequestException("Delivery Status cannot be " + deliveryStatus + ". Current delivery status is: " + delivery.getDeliveryStatus() + ". Status can be: DELIVERED, FAILED");
+			}
+			throw new BadRequestException("Delivery Status cannot be " + deliveryStatus + ". Current delivery status is: " + delivery.getDeliveryStatus() + ". Status can be: IN_TRANSIT, DELIVERED, FAILED");
+		}
+		if (deliveryStatus.equals("IN_TRANSIT")) {
+			throw new BadRequestException("Delivery Status cannot be " + deliveryStatus + ". Current delivery status is: " + delivery.getDeliveryStatus() + ". Status can be: DELIVERED, FAILED");
+		}
+		throw new BadRequestException("Status is not correct. Status can be: PLANNED, IN_TRANSIT, DELIVERED, FAILED");
 	}
 
 	private void archiveDelivery(DeliveryDTO deliveryDTO) {
