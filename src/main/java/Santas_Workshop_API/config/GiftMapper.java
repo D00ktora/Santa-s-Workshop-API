@@ -9,6 +9,8 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface GiftMapper {
 	GiftMapper INSTANCE = Mappers.getMapper(GiftMapper.class);
+	@Mapping(source = "elf.id", target = "elfId")
+	@Mapping(source = "delivery.id", target = "deliveryId")
 	GiftDTO fromGiftToGiftDTO(Gift gift);
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "elf", ignore = true)

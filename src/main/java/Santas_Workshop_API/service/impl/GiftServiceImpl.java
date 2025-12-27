@@ -4,11 +4,12 @@ import Santas_Workshop_API.config.GiftMapper;
 import Santas_Workshop_API.config.errorHandling.exceptions.BadRequestException;
 import Santas_Workshop_API.config.errorHandling.exceptions.NotFoundException;
 import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
+import Santas_Workshop_API.entity.DeliveredGift;
 import Santas_Workshop_API.entity.Delivery;
 import Santas_Workshop_API.entity.Gift;
 import Santas_Workshop_API.entity.enums.gift.Category;
 import Santas_Workshop_API.entity.enums.gift.Status;
-import Santas_Workshop_API.repository.DeliveredGiftsRepository;
+import Santas_Workshop_API.repository.ArchivedGiftsRepository;
 import Santas_Workshop_API.repository.GiftsRepository;
 import Santas_Workshop_API.service.GiftService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -30,7 +30,7 @@ import java.util.Set;
 public class GiftServiceImpl implements GiftService {
 
 	private final GiftsRepository giftsRepository;
-	private final DeliveredGiftsRepository deliveredGiftsRepository;
+	private final ArchivedGiftsRepository archivedGiftsRepository;
 
 	@Override
 	public GiftDTO createGift(GiftDTO inputGiftDTO) {
@@ -93,6 +93,31 @@ public class GiftServiceImpl implements GiftService {
 			giftDTOS.add(GiftMapper.INSTANCE.fromGiftToGiftDTO(gift));
 		}
 		return giftDTOS;
+	}
+
+	@Override
+	public Set<Gift> setGiftStatusToLoaded(Set<Long> giftIds, Delivery delivery) {
+		List<Gift> allById = giftsRepository.findAllById(giftIds);
+		for (Gift gift : allById) {
+			gift.setStatus(Status.LOADED);
+			gift.setDelivery(delivery);
+		}
+		List<Gift> gifts = giftsRepository.saveAll(allById);
+		return new HashSet<>(gifts);
+	}
+
+	@Override
+	public void setGiftStatus(Set<Gift> gifts, String status) {
+		switch (status) {
+			case "DELIVERED": {
+				archiveGifts(gifts);
+			}
+			break;
+			case "FAILED": {
+				resetGifts(gifts);
+			}
+			break;
+		}
 	}
 
 	private static Pageable createPageable(int page, int size, String sort) throws BadRequestException {
@@ -158,20 +183,34 @@ public class GiftServiceImpl implements GiftService {
 		}
 	}
 
-	@Override
-	public Set<Gift> setGiftStatusToLoaded(Set<Long> giftIds, Delivery delivery) {
-		List<Gift> allById = giftsRepository.findAllById(giftIds);
-		for (Gift gift : allById) {
-			gift.setStatus(Status.LOADED);
-			gift.setDelivery(delivery);
+	private void resetGifts(Set<Gift> gifts) {
+		for (Gift gift : gifts) {
+			gift.setStatus(Status.READY);
+			gift.setDelivery(null);
 		}
-		List<Gift> gifts = giftsRepository.saveAll(allById);
-		return new HashSet<>(gifts);
+		giftsRepository.saveAll(gifts);
 	}
 
-	@Override
-	public void setGiftStatusToDelivered(Set<Gift> gifts) {
-		deliveredGiftsRepository.saveAll(gifts);
-		giftsRepository.deleteAll(gifts);
+	private void archiveGifts(Set<Gift> gifts) {
+		for (Gift gift : gifts) {
+			gift.setStatus(Status.DELIVERED);
+			DeliveredGift deliveredGift = mapGiftToDelivered(gift);
+			archivedGiftsRepository.save(deliveredGift);
+			giftsRepository.delete(gift);
+		}
+	}
+
+	private DeliveredGift mapGiftToDelivered(Gift gift) {
+		DeliveredGift deliveredGift = new DeliveredGift();
+		deliveredGift.setGiftId(gift.getId());
+		deliveredGift.setName(gift.getName());
+		deliveredGift.setCategory(gift.getCategory().toString());
+		deliveredGift.setTargetAge(gift.getTargetAge().toString());
+		deliveredGift.setIsWrapped(gift.getIsWrapped().toString());
+		deliveredGift.setStatus(gift.getStatus().toString());
+		deliveredGift.setCreatedAt(gift.getCreatedAt().toString());
+		deliveredGift.setElfId(gift.getElf().getId());
+		deliveredGift.setDeliveryId(gift.getDelivery().getId());
+		return deliveredGift;
 	}
 }

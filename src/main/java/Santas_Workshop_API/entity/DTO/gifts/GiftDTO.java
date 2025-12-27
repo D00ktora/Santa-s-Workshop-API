@@ -43,5 +43,9 @@ public class GiftDTO {
 
 	private String status;
 
+	private Long elfId;
+
+	private Long deliveryId;
+
 	private LocalDateTime createdAt;
 }
