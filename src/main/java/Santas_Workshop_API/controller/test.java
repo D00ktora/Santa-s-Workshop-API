@@ -39,59 +39,59 @@ public class test {
 	 */
 	private final GiftService giftService;
 
-	@PostMapping("/")
-	public ResponseEntity<GiftDTO> createGift(@RequestBody @Validated(CreateValidation.class) GiftDTO inputGiftDTO, BindingResult bindingResult) throws BadRequestException {
-		if (bindingResult.hasErrors()) {
-			throw new BadRequestException(getErrors(bindingResult));}
-		GiftDTO gift = giftService.createGift(inputGiftDTO);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(gift.getId()).toUri();
-		return ResponseEntity.created(location).body(gift);
-	}
+//	@PostMapping("/")
+//	public ResponseEntity<GiftDTO> createGift(@RequestBody @Validated(CreateValidation.class) GiftDTO inputGiftDTO, BindingResult bindingResult) throws BadRequestException {
+//		if (bindingResult.hasErrors()) {
+//			throw new BadRequestException(getErrors(bindingResult));}
+//		GiftDTO gift = giftService.createGift(inputGiftDTO);
+//		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(gift.getId()).toUri();
+//		return ResponseEntity.created(location).body(gift);
+//	}
 
-	@GetMapping("/")
-	public Page<GiftDTO> getGifts(
-			@RequestParam(required = false) String status,
-			@RequestParam(required = false) String category,
-			@RequestParam(required = false) String wrapped,
-			@RequestParam(required = false, defaultValue = "0") int page,
-			@RequestParam(required = false, defaultValue = "100") int pageSize,
-			@RequestParam(required = false, defaultValue = "createdAt") String sort
-	) throws BadRequestException {
-		return giftService.getAllGifts(status, category, wrapped, page, pageSize, sort);
-	}
+//	@GetMapping("/")
+//	public Page<GiftDTO> getGifts(
+//			@RequestParam(required = false) String status,
+//			@RequestParam(required = false) String category,
+//			@RequestParam(required = false) String wrapped,
+//			@RequestParam(required = false, defaultValue = "0") int page,
+//			@RequestParam(required = false, defaultValue = "100") int pageSize,
+//			@RequestParam(required = false, defaultValue = "createdAt") String sort
+//	) throws BadRequestException {
+//		return giftService.getAllGifts(status, category, wrapped, page, pageSize, sort);
+//	}
 
-	@GetMapping("/{id}")
-	public ResponseEntity<GiftDTO> getGift(@PathVariable Long id) {
-		GiftDTO giftById = giftService.getGiftById(id);
-		return ResponseEntity.ok(giftById);
-	}
+//	@GetMapping("/{id}")
+//	public ResponseEntity<GiftDTO> getGift(@PathVariable Long id) {
+//		GiftDTO giftById = giftService.getGiftById(id);
+//		return ResponseEntity.ok(giftById);
+//	}
 
-	@PostMapping("/{id}")
-	public ResponseEntity<GiftDTO> updateGift(@PathVariable Long id, @RequestBody @Validated(UpdateValidation.class) GiftDTO updateInputDTO, BindingResult bindingResult) throws BadRequestException {
-		if (bindingResult.hasErrors()) {
-			throw new BadRequestException(getErrors(bindingResult));
-		}
-		GiftDTO giftDTO = giftService.updateGift(id, updateInputDTO);
-		return ResponseEntity.ok(giftDTO);
-	}
+//	@PostMapping("/{id}")
+//	public ResponseEntity<GiftDTO> updateGift(@PathVariable Long id, @RequestBody @Validated(UpdateValidation.class) GiftDTO updateInputDTO, BindingResult bindingResult) throws BadRequestException {
+//		if (bindingResult.hasErrors()) {
+//			throw new BadRequestException(getErrors(bindingResult));
+//		}
+//		GiftDTO giftDTO = giftService.updateGift(id, updateInputDTO);
+//		return ResponseEntity.ok(giftDTO);
+//	}
 
-	@PutMapping("/{id}/wrap")
-	public ResponseEntity<GiftDTO> wrapGift(@PathVariable Long id) {
-		GiftDTO giftDTO = giftService.wrapGift(id);
-		return ResponseEntity.ok(giftDTO);
-	}
+//	@PutMapping("/{id}/wrap")
+//	public ResponseEntity<GiftDTO> wrapGift(@PathVariable Long id) {
+//		GiftDTO giftDTO = giftService.wrapGift(id);
+//		return ResponseEntity.ok(giftDTO);
+//	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<GiftDTO> deleteGift(@PathVariable Long id) {
-		giftService.deleteGift(id);
-		return ResponseEntity.noContent().build();
-	}
+//	@DeleteMapping("/{id}")
+//	public ResponseEntity<GiftDTO> deleteGift(@PathVariable Long id) {
+//		giftService.deleteGift(id);
+//		return ResponseEntity.noContent().build();
+//	}
 
-	@GetMapping("/search")
-	public ResponseEntity<List<GiftDTO>> searchGifts(@RequestParam String query) throws BadRequestException {
-		return ResponseEntity.ok(giftService.searchGifts(query));
-
-	}
+//	@GetMapping("/search")
+//	public ResponseEntity<List<GiftDTO>> searchGifts(@RequestParam String query) throws BadRequestException {
+//		return ResponseEntity.ok(giftService.searchGifts(query));
+//
+//	}
 
 	/*
 	For Gift Controller End
@@ -105,52 +105,52 @@ public class test {
 
 	private final ElfService elfService;
 
-	@PostMapping("/elves")
-	public ResponseEntity<ElfDTO> createElf(@RequestBody @Valid ElfDTO elfDTO, BindingResult bindingResult) throws BadRequestException {
-		if (bindingResult.hasErrors()) {
-			throw new BadRequestException(getErrors(bindingResult));
-		}
-		return ResponseEntity.ok(elfService.createElf(elfDTO));
-	}
+//	@PostMapping("/elves")
+//	public ResponseEntity<ElfDTO> createElf(@RequestBody @Valid ElfDTO elfDTO, BindingResult bindingResult) throws BadRequestException {
+//		if (bindingResult.hasErrors()) {
+//			throw new BadRequestException(getErrors(bindingResult));
+//		}
+//		return ResponseEntity.ok(elfService.createElf(elfDTO));
+//	}
 
 
-	@GetMapping("/elves")
-	public ResponseEntity<List<ElfDTO>> getElves() {
-		List<ElfDTO> allElves = elfService.getAllElves();
-		return ResponseEntity.ok(allElves);
-	}
+//	@GetMapping("/elves")
+//	public ResponseEntity<List<ElfDTO>> getElves() {
+//		List<ElfDTO> allElves = elfService.getAllElves();
+//		return ResponseEntity.ok(allElves);
+//	}
 
-	@GetMapping("/elves/{id}")
-	public ResponseEntity<ElfDTO> getElf(@PathVariable Long id) {
-		ElfDTO elfDTO = elfService.getElfById(id);
-		return ResponseEntity.ok(elfDTO);
-	}
+//	@GetMapping("/elves/{id}")
+//	public ResponseEntity<ElfDTO> getElf(@PathVariable Long id) {
+//		ElfDTO elfDTO = elfService.getElfById(id);
+//		return ResponseEntity.ok(elfDTO);
+//	}
 
-	@DeleteMapping("/elves/{id}")
-	public ResponseEntity<ElfDTO> deleteElf(@PathVariable Long id) {
-		elfService.deleteElfById(id);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-	}
+//	@DeleteMapping("/elves/{id}")
+//	public ResponseEntity<ElfDTO> deleteElf(@PathVariable Long id) {
+//		elfService.deleteElfById(id);
+//		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+//	}
 
-	@PostMapping("/elves/{elfId}/assign/{giftId}")
-	public ResponseEntity<ElfDTO> assignGift(@PathVariable Long elfId, @PathVariable Long giftId) {
-		ElfDTO elfDTO = elfService.assignGift(elfId, giftId);
-		return ResponseEntity.ok(elfDTO);
-	}
+//	@PostMapping("/elves/{elfId}/assign/{giftId}")
+//	public ResponseEntity<ElfDTO> assignGift(@PathVariable Long elfId, @PathVariable Long giftId) {
+//		ElfDTO elfDTO = elfService.assignGift(elfId, giftId);
+//		return ResponseEntity.ok(elfDTO);
+//	}
 
 	/*
 	For Gift and Elves Method, but it will be split after finishing
 	 */
-	private static String getErrors(BindingResult bindingResult) {
-		StringBuilder errors = new StringBuilder();
-		for (FieldError fieldError : bindingResult.getFieldErrors()) {
-			errors.append(fieldError.getField())
-					.append(" - ")
-					.append(fieldError.getDefaultMessage())
-					.append(" / ");
-		}
-		return errors.toString();
-	}
+//	private static String getErrors(BindingResult bindingResult) {
+//		StringBuilder errors = new StringBuilder();
+//		for (FieldError fieldError : bindingResult.getFieldErrors()) {
+//			errors.append(fieldError.getField())
+//					.append(" - ")
+//					.append(fieldError.getDefaultMessage())
+//					.append(" / ");
+//		}
+//		return errors.toString();
+//	}
 
 
 	/*
@@ -159,23 +159,23 @@ public class test {
 
 	private final DeliveryService deliveryService;
 
-	@PostMapping("/delivery")
-	public ResponseEntity<DeliveryDTO> deliver(@RequestBody @Valid DeliveryDTO deliveryDTO, BindingResult bindingResult) throws BadRequestException {
-		if (bindingResult.hasErrors()) {
-			throw new BadRequestException(getErrors(bindingResult));
-		}
-		DeliveryDTO deliveryPlan = deliveryService.createDeliveryPlan(deliveryDTO);
-		return ResponseEntity.status(HttpStatus.CREATED).body(deliveryPlan);
-	}
+//	@PostMapping("/delivery")
+//	public ResponseEntity<DeliveryDTO> deliver(@RequestBody @Valid DeliveryDTO deliveryDTO, BindingResult bindingResult) throws BadRequestException {
+//		if (bindingResult.hasErrors()) {
+//			throw new BadRequestException(getErrors(bindingResult));
+//		}
+//		DeliveryDTO deliveryPlan = deliveryService.createDeliveryPlan(deliveryDTO);
+//		return ResponseEntity.status(HttpStatus.CREATED).body(deliveryPlan);
+//	}
 
-	@GetMapping("/deliveries")
-	public ResponseEntity<List<DeliveryDTO>> getDeliveryPlan(
-			@RequestParam(required = false) String deliveryStatus,
-			@RequestParam(required = false) String recipientName
-	) {
-		List<DeliveryDTO> allDeliveries = deliveryService.getAllDeliveries(deliveryStatus, recipientName);
-		return ResponseEntity.ok(allDeliveries);
-	}
+//	@GetMapping("/deliveries")
+//	public ResponseEntity<List<DeliveryDTO>> getDeliveryPlan(
+//			@RequestParam(required = false) String deliveryStatus,
+//			@RequestParam(required = false) String recipientName
+//	) {
+//		List<DeliveryDTO> allDeliveries = deliveryService.getAllDeliveries(deliveryStatus, recipientName);
+//		return ResponseEntity.ok(allDeliveries);
+//	}
 
 	@PatchMapping("/deliveries/{id}/")
 	public ResponseEntity<DeliveryDTO> updateDelivery(@PathVariable Long id, @RequestParam String deliveryStatus) throws BadRequestException {
