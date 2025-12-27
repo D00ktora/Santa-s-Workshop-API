@@ -24,5 +24,5 @@ public interface GiftService {
 	void deleteGift(Long id);
 	List<GiftDTO> searchGifts(String searchWord) throws BadRequestException;
 	Set<Gift> setGiftStatusToLoaded(Set<Long> giftIds, Delivery delivery);
-	void setGiftStatusToDelivered(Set<Gift> gifts);
+	void setGiftStatus(Set<Gift> gifts, String status);
 }

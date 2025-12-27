@@ -4,23 +4,23 @@ import Santas_Workshop_API.config.DeliveryMapping;
 import Santas_Workshop_API.config.errorHandling.exceptions.BadRequestException;
 import Santas_Workshop_API.config.errorHandling.exceptions.ConflictException;
 import Santas_Workshop_API.config.errorHandling.exceptions.NotFoundException;
+import Santas_Workshop_API.entity.ArchivedDelivery;
 import Santas_Workshop_API.entity.DTO.deliveries.DeliveryDTO;
 import Santas_Workshop_API.entity.DTO.gifts.GiftDTO;
 import Santas_Workshop_API.entity.Delivery;
 import Santas_Workshop_API.entity.Gift;
 import Santas_Workshop_API.entity.enums.delivery.Status;
+import Santas_Workshop_API.repository.ArchivedDeliveriesRepository;
 import Santas_Workshop_API.repository.DeliveryRepository;
 import Santas_Workshop_API.service.DeliveryService;
 import Santas_Workshop_API.service.GiftService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 public class DeliveryServiceImpl implements DeliveryService {
 	private final DeliveryRepository deliveryRepository;
 	private final GiftService giftService;
+	private final ArchivedDeliveriesRepository archivedDeliveriesRepository;
 
 	@Override
 	public DeliveryDTO createDeliveryPlan(DeliveryDTO deliveryDTO) throws BadRequestException {
@@ -70,9 +71,13 @@ public class DeliveryServiceImpl implements DeliveryService {
 		for (Gift gift : delivery.getGifts()) {
 			giftIds.add(gift.getId());
 		}
-		giftService.setGiftStatusToDelivered(delivery.getGifts());
+		giftService.setGiftStatus(delivery.getGifts(), delivery.getDeliveryStatus().toString());
 		DeliveryDTO deliveryDTO = DeliveryMapping.INSTANCE.mapToDeliveryDto(delivery);
 		deliveryDTO.setGifts(giftIds);
+		if (deliveryDTO.getDeliveryStatus().equals("DELIVERED") || deliveryDTO.getDeliveryStatus().equals("FAILED")) {
+			archiveDelivery(deliveryDTO);
+			deliveryRepository.delete(delivery);
+		}
 		return deliveryDTO;
 	}
 
@@ -93,6 +98,9 @@ public class DeliveryServiceImpl implements DeliveryService {
 			GiftDTO giftById = giftService.getGiftById(id);
 			if (giftById == null) {
 				throw new NotFoundException("Gift with id " + id + " not found");
+			}
+			if (giftById.getElfId() == null) {
+				throw new BadRequestException("Gift is not created by Elf");
 			}
 			if (giftById.getStatus().equals(Santas_Workshop_API.entity.enums.gift.Status.PENDING.toString())) {
 				throw new ConflictException("Gift with id " + id + " is not ready");
@@ -122,9 +130,6 @@ public class DeliveryServiceImpl implements DeliveryService {
 
 	private Status checkAndGetDeliveryStatus(String deliveryStatus, Delivery delivery) throws BadRequestException {
 		if (delivery.getDeliveryStatus().equals(Status.PLANNED) && (deliveryStatus.equals("DELIVERED") || deliveryStatus.equals("IN_TRANSIT") || deliveryStatus.equals("FAILED"))) {
-			//todo: If status is set to Failed then gifts needs to be changed from Loaded to Ready.
-			//todo And gift must be removed from Delivery and put in gift repository.
-			//todo And delivery must be deleted after that.
 			switch (deliveryStatus){
 				case "DELIVERED": return Status.DELIVERED;
 				case "IN_TRANSIT": return Status.IN_TRANSIT;
@@ -132,20 +137,22 @@ public class DeliveryServiceImpl implements DeliveryService {
 			}
 		}
 		if (delivery.getDeliveryStatus().equals(Status.IN_TRANSIT) && (deliveryStatus.equals("DELIVERED") || deliveryStatus.equals("FAILED"))) {
-			//todo: If status is set to Failed then gifts needs to be changed from Loaded to Ready.
-			//todo And gift must be removed from Delivery and put in gift repository.
-			//todo And delivery must be deleted after that.
 			switch (deliveryStatus) {
 				case "DELIVERED": return Status.DELIVERED;
 				case "FAILED": return Status.FAILED;
 			}
 		}
-		if (delivery.getDeliveryStatus().equals(Status.DELIVERED) && deliveryStatus.equals("FAILED")) {
-			//todo: If status is set to Failed then gifts needs to be changed from Loaded to Ready.
-			//todo And gift must be removed from Delivery and put in gift repository.
-			//todo And delivery must be deleted after that.
-			return Status.FAILED;
-		}
 		throw new BadRequestException("Delivery Status cannot be " + deliveryStatus);
+	}
+
+	private void archiveDelivery(DeliveryDTO deliveryDTO) {
+		ArchivedDelivery archivedDelivery = new ArchivedDelivery();
+		archivedDelivery.setDeliveryId(deliveryDTO.getId());
+		archivedDelivery.setAddress(deliveryDTO.getAddress());
+		archivedDelivery.setRecipientName(deliveryDTO.getRecipientName());
+		archivedDelivery.setEstimatedArrival(deliveryDTO.getEstimatedArrival().toString());
+		archivedDelivery.setGifts(deliveryDTO.getGifts());
+		archivedDelivery.setDeliveryStatus(deliveryDTO.getDeliveryStatus());
+		archivedDeliveriesRepository.save(archivedDelivery);
 	}
 }
