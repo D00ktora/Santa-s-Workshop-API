@@ -25,7 +25,7 @@ import java.util.List;
 public class ElfController {
 	private final ElfService elfService;
 
-	@PostMapping("/")
+	@PostMapping()
 	public ResponseEntity<ElfDTO> createElf(@RequestBody @Valid ElfDTO elfDTO, BindingResult bindingResult) throws BadRequestException {
 		if (bindingResult.hasErrors()) {
 			throw new BadRequestException(getErrors(bindingResult));
@@ -33,7 +33,7 @@ public class ElfController {
 		return ResponseEntity.ok(elfService.createElf(elfDTO));
 	}
 
-	@GetMapping("/")
+	@GetMapping()
 	public ResponseEntity<List<ElfDTO>> getElves() {
 		List<ElfDTO> allElves = elfService.getAllElves();
 		return ResponseEntity.ok(allElves);

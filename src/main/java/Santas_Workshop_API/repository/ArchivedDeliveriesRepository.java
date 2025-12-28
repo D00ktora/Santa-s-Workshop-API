@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ArchivedDeliveriesRepository extends JpaRepository<ArchivedDelivery, Long> {
+	Long countByDeliveryStatus(String status);
 }
