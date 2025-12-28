@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ArchivedGiftsRepository extends JpaRepository<DeliveredGift, Long> {
+	Long countByStatus(String status);
 }

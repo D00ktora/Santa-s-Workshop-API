@@ -27,7 +27,7 @@ import java.util.List;
 public class DeliveryController {
 	private final DeliveryService deliveryService;
 
-	@PostMapping("/")
+	@PostMapping()
 	public ResponseEntity<DeliveryDTO> deliver(@RequestBody @Valid DeliveryDTO deliveryDTO, BindingResult bindingResult) throws BadRequestException {
 		if (bindingResult.hasErrors()) {
 			throw new BadRequestException(getErrors(bindingResult));
@@ -36,7 +36,7 @@ public class DeliveryController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(deliveryPlan);
 	}
 
-	@GetMapping("/")
+	@GetMapping()
 	public ResponseEntity<List<DeliveryDTO>> getDeliveryPlan(
 			@RequestParam(required = false) String deliveryStatus,
 			@RequestParam(required = false) String recipientName

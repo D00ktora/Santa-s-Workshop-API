@@ -32,7 +32,7 @@ import java.util.List;
 public class GiftController {
 	private final GiftService giftService;
 
-	@PostMapping("/")
+	@PostMapping()
 	public ResponseEntity<GiftDTO> createGift(@RequestBody @Validated(CreateValidation.class) GiftDTO inputGiftDTO, BindingResult bindingResult) throws BadRequestException {
 		if (bindingResult.hasErrors()) {
 			throw new BadRequestException(getErrors(bindingResult));}
@@ -41,7 +41,7 @@ public class GiftController {
 		return ResponseEntity.created(location).body(gift);
 	}
 
-	@GetMapping("/")
+	@GetMapping()
 	public Page<GiftDTO> getGifts(
 			@RequestParam(required = false) String status,
 			@RequestParam(required = false) String category,
