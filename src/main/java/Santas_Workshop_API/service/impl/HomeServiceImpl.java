@@ -39,6 +39,7 @@ public class HomeServiceImpl implements HomeService {
 		generalInformationDTO.setCurrentServerTime(LocalDateTime.now().toString());
 		Map<String, Set<String>> endpoints = new LinkedHashMap<>();
 		endpoints.computeIfAbsent("home", k -> new LinkedHashSet<>()).add("GET: /api - General information for the app.");
+		endpoints.computeIfAbsent("home", k -> new LinkedHashSet<>()).add("GET: /api/stats - Get gift and deliveries stats.");
 		endpoints.computeIfAbsent("gifts", k -> new LinkedHashSet<>()).add("POST: /api/gifts - Create Gift - Accept JSON as follow: {name: (String) ,category: (String),targetAge: (Integer),isWrapped: (Boolean)} - Category can be one of the following: TOY, BOOK, GADGET, CLOTHES, OTHER");
 		endpoints.computeIfAbsent("gifts", k -> new LinkedHashSet<>()).add("GET: /api/gifts - Get all gift with pagination. - Optional parameters are : status, category, wrapper, page(default = 0), pageSize(default = 100), sort(default = createdAt)");
 		endpoints.computeIfAbsent("gifts", k -> new LinkedHashSet<>()).add("GET: /api/gifts/{id} - Ger gift by ID");

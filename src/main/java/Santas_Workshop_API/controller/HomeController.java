@@ -15,15 +15,12 @@ public class HomeController {
 
 	@GetMapping("/api")
 	public GeneralInformationDTO info(){
-		GeneralInformationDTO generalInformationDTO = homeService.showGeneralInformation();
-		return generalInformationDTO;
+		return homeService.showGeneralInformation();
 	}
 
 	@GetMapping("/api/stats")
 	public StatsWrapperDTO stats(){
-		StatsWrapperDTO statsDTO = homeService.showStats();
-		System.out.println();
-		return statsDTO;
+		return homeService.showStats();
 	}
 
 }
