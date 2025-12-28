@@ -1,0 +1,29 @@
+[
+  { "name": "Alvin", "skillLevel": "JUNIOR" },
+  { "name": "Bella", "skillLevel": "MID" },
+  { "name": "Cedric", "skillLevel": "SENIOR" },
+  { "name": "Daisy", "skillLevel": "MID" },
+  { "name": "Elmo", "skillLevel": "JUNIOR" },
+  { "name": "Fiona", "skillLevel": "SENIOR" },
+  { "name": "Garry", "skillLevel": "MID" },
+  { "name": "Holly", "skillLevel": "JUNIOR" },
+  { "name": "Ivy", "skillLevel": "MID" },
+  { "name": "Jack", "skillLevel": "SENIOR" },
+
+  { "name": "Katy", "skillLevel": "MID" },
+  { "name": "Leo", "skillLevel": "JUNIOR" },
+  { "name": "Mila", "skillLevel": "MID" },
+  { "name": "Niko", "skillLevel": "SENIOR" },
+  { "name": "Olga", "skillLevel": "MID" },
+  { "name": "Penny", "skillLevel": "JUNIOR" },
+  { "name": "Quinn", "skillLevel": "MID" },
+  { "name": "Rory", "skillLevel": "SENIOR" },
+  { "name": "Sasha", "skillLevel": "MID" },
+  { "name": "Tom", "skillLevel": "JUNIOR" },
+
+  { "name": "Uma", "skillLevel": "MID" },
+  { "name": "Viktor", "skillLevel": "SENIOR" },
+  { "name": "Willow", "skillLevel": "MID" },
+  { "name": "Xander", "skillLevel": "JUNIOR" },
+  { "name": "Yara", "skillLevel": "MID" }
+]

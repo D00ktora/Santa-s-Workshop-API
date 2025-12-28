@@ -1,0 +1,55 @@
+[
+  { "name": "Toy Car", "category": "TOY", "targetAge": 5, "isWrapped": "true" },
+  { "name": "Story Book", "category": "BOOK", "targetAge": 8, "isWrapped": "false" },
+  { "name": "RC Drone", "category": "GADGET", "targetAge": 14, "isWrapped": "true" },
+  { "name": "Winter Jacket", "category": "CLOTHES", "targetAge": 10, "isWrapped": "true" },
+  { "name": "Puzzle Box", "category": "TOY", "targetAge": 7, "isWrapped": "false" },
+
+  { "name": "Math Workbook", "category": "BOOK", "targetAge": 9, "isWrapped": "true" },
+  { "name": "Smart Watch", "category": "GADGET", "targetAge": 12, "isWrapped": "true" },
+  { "name": "Teddy Bear", "category": "TOY", "targetAge": 4, "isWrapped": "true" },
+  { "name": "Kids Sweater", "category": "CLOTHES", "targetAge": 6, "isWrapped": "false" },
+  { "name": "Coloring Book", "category": "BOOK", "targetAge": 5, "isWrapped": "true" },
+
+  { "name": "Robot Toy", "category": "TOY", "targetAge": 8, "isWrapped": "true" },
+  { "name": "Science Book", "category": "BOOK", "targetAge": 11, "isWrapped": "false" },
+  { "name": "Tablet Mini", "category": "GADGET", "targetAge": 13, "isWrapped": "true" },
+  { "name": "Jeans", "category": "CLOTHES", "targetAge": 12, "isWrapped": "true" },
+  { "name": "Chess Set", "category": "TOY", "targetAge": 10, "isWrapped": "false" },
+
+  { "name": "Board Game", "category": "TOY", "targetAge": 9, "isWrapped": "true" },
+  { "name": "Fantasy Novel", "category": "BOOK", "targetAge": 14, "isWrapped": "true" },
+  { "name": "Wireless Headphones", "category": "GADGET", "targetAge": 15, "isWrapped": "true" },
+  { "name": "Hoodie", "category": "CLOTHES", "targetAge": 13, "isWrapped": "false" },
+  { "name": "Lego Set", "category": "TOY", "targetAge": 7, "isWrapped": "true" },
+
+  { "name": "Notebook", "category": "BOOK", "targetAge": 10, "isWrapped": "false" },
+  { "name": "Game Controller", "category": "GADGET", "targetAge": 16, "isWrapped": "true" },
+  { "name": "Action Figure", "category": "TOY", "targetAge": 6, "isWrapped": "true" },
+  { "name": "Raincoat", "category": "CLOTHES", "targetAge": 8, "isWrapped": "true" },
+  { "name": "Picture Book", "category": "BOOK", "targetAge": 4, "isWrapped": "true" },
+
+  { "name": "Toy Train", "category": "TOY", "targetAge": 5, "isWrapped": "false" },
+  { "name": "Encyclopedia", "category": "BOOK", "targetAge": 15, "isWrapped": "true" },
+  { "name": "Bluetooth Speaker", "category": "GADGET", "targetAge": 14, "isWrapped": "true" },
+  { "name": "Winter Gloves", "category": "CLOTHES", "targetAge": 9, "isWrapped": "false" },
+  { "name": "Magic Kit", "category": "TOY", "targetAge": 11, "isWrapped": "true" },
+
+  { "name": "Comic Book", "category": "BOOK", "targetAge": 10, "isWrapped": "true" },
+  { "name": "VR Headset", "category": "GADGET", "targetAge": 17, "isWrapped": "true" },
+  { "name": "Plush Unicorn", "category": "TOY", "targetAge": 6, "isWrapped": "true" },
+  { "name": "Sports Jacket", "category": "CLOTHES", "targetAge": 14, "isWrapped": "false" },
+  { "name": "Sticker Book", "category": "BOOK", "targetAge": 5, "isWrapped": "true" },
+
+  { "name": "Toy Dinosaur", "category": "TOY", "targetAge": 7, "isWrapped": "true" },
+  { "name": "History Book", "category": "BOOK", "targetAge": 16, "isWrapped": "false" },
+  { "name": "Smart Lamp", "category": "GADGET", "targetAge": 15, "isWrapped": "true" },
+  { "name": "T-Shirt", "category": "CLOTHES", "targetAge": 10, "isWrapped": "true" },
+  { "name": "Building Blocks", "category": "TOY", "targetAge": 4, "isWrapped": "true" },
+
+  { "name": "Sketch Book", "category": "BOOK", "targetAge": 9, "isWrapped": "false" },
+  { "name": "Camera Toy", "category": "GADGET", "targetAge": 8, "isWrapped": "true" },
+  { "name": "Dress", "category": "CLOTHES", "targetAge": 11, "isWrapped": "true" },
+  { "name": "Toy Helicopter", "category": "TOY", "targetAge": 6, "isWrapped": "false" },
+  { "name": "Adventure Book", "category": "BOOK", "targetAge": 12, "isWrapped": "true" }
+]
