@@ -31,23 +31,31 @@ public class Gift {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	@Column(nullable = false)
 	@Size(min = 2, max = 50)
 	private String name;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Category category;
+
 	@Min(value = 0)
 	@Max(value = 99)
 	private Integer targetAge;
+
 	private Boolean isWrapped = false;
+
 	@Enumerated(EnumType.STRING)
 	private Status status = Status.PENDING;
+
 	@Column(nullable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "elf_id")
 	private Elf elf;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "delivery_id")
 	private Delivery delivery;
