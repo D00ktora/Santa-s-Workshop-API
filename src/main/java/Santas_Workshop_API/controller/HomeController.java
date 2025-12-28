@@ -1,7 +1,6 @@
 package Santas_Workshop_API.controller;
 
 import Santas_Workshop_API.entity.DTO.general.GeneralInformationDTO;
-import Santas_Workshop_API.entity.DTO.general.StatsDTO;
 import Santas_Workshop_API.entity.DTO.general.StatsWrapperDTO;
 import Santas_Workshop_API.service.HomeService;
 import lombok.RequiredArgsConstructor;
